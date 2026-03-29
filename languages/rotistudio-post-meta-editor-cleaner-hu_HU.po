@@ -1,0 +1,341 @@
+# Copyright (C) 2026 RotiStudio
+# This file is distributed under the GPLv2 or later.
+# Hungarian (Hungary) translation - semleges nyelvezet
+msgid ""
+msgstr ""
+"Project-Id-Version: Post Meta Editor and Cleaner by RotiStudio 1.0.0\n"
+"Report-Msgid-Bugs-To: https://rotistudio.com/\n"
+"POT-Creation-Date: 2026-02-26 08:00+0100\n"
+"PO-Revision-Date: 2026-03-06 12:27+0100\n"
+"Last-Translator: RotiStudio <info@rotistudio.hu>\n"
+"Language-Team: Magyar <hu@li.org>\n"
+"Language: hu_HU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.8\n"
+
+#: admin/admin-core.php:97 admin/admin-core.php:98 admin/admin-core.php:224
+msgid "Post Meta EAC"
+msgstr "Post Meta EAC"
+
+#: admin/admin-core.php:106 admin/admin-core.php:107 admin/admin-core.php:199
+#: admin/admin-core.php:448
+msgid "Settings"
+msgstr "Beállítások"
+
+#: admin/admin-core.php:115 admin/admin-core.php:116 admin/admin-core.php:200
+#: admin/admin-core.php:453
+msgid "Help"
+msgstr "Súgó"
+
+#: admin/admin-core.php:166
+msgid "Processing…"
+msgstr "Feldolgozás…"
+
+#: admin/admin-core.php:167
+msgid "Done!"
+msgstr "Kész!"
+
+#: admin/admin-core.php:168
+msgid "An error occurred."
+msgstr "Hiba történt."
+
+#: admin/admin-core.php:169
+msgid "Are you sure you want to delete this meta key and all its values for all posts?"
+msgstr "A kijelölt meta kulcs és minden értéke törlődik minden bejegyzésből. Folytatás?"
+
+#: admin/admin-core.php:170
+msgid "Are you sure you want to clear the values of this meta key for all posts? The key itself will remain."
+msgstr "A meta kulcs értékei törlődnek minden post-ból, de a kulcs maga megmarad. Biztosan?"
+
+#: admin/admin-core.php:172
+msgid "Are you sure you want to perform this action on %d selected items?"
+msgstr "A művelet végrehajtása a kijelölt %d elemen. Folytatás?"
+
+#: admin/admin-core.php:173
+msgid "Please select an action."
+msgstr "Művelet kiválasztása szükséges."
+
+#: admin/admin-core.php:174
+msgid "Please select at least one item."
+msgstr "Legalább egy elem kijelölése szükséges."
+
+#: admin/admin-core.php:175
+msgid "Are you sure you want to overwrite and replace the full post meta field content?"
+msgstr "A post meta mező teljes tartalma felülíródik az új értékkel. Folytatás?"
+
+#: admin/admin-core.php:176
+msgid "Are you sure you want to perform search & replace on all values (values only) for this meta key?"
+msgstr "Keresés és csere végrehajtása minden értékben (csak értékek, kulcsok változatlanok). Folytatás?"
+
+#: admin/admin-core.php:177
+msgid "Are you sure you want to perform search & replace on all values and keys (name and value) for this meta key?"
+msgstr "Keresés és csere végrehajtása minden értékben és kulcsban. Folytatás?"
+
+#: admin/admin-core.php:178 admin/page-dashboard.php:240
+msgid "New value:"
+msgstr "Új érték:"
+
+#: admin/admin-core.php:179 admin/page-dashboard.php:248
+msgid "Search:"
+msgstr "Keresés:"
+
+#: admin/admin-core.php:180 admin/page-dashboard.php:251
+msgid "Replace with:"
+msgstr "Csere erre:"
+
+#: admin/admin-core.php:181 admin/page-dashboard.php:243
+#: admin/page-dashboard.php:254
+msgid "Apply"
+msgstr "Alkalmaz"
+
+#: admin/admin-core.php:182 admin/page-dashboard.php:244
+#: admin/page-dashboard.php:255
+msgid "Cancel"
+msgstr "Mégse"
+
+#: admin/admin-core.php:198
+msgid "Post Meta table"
+msgstr "Post meta táblázat"
+
+#: admin/admin-core.php:229
+msgid "Post Meta Editor and Cleaner by RotiStudio"
+msgstr "Post Meta Szerkesztő és Tisztító (RotiStudio)"
+
+#: admin/admin-core.php:289
+msgid "Invalid bulk action or no items selected."
+msgstr "Érvénytelen művelet vagy nincs kijelölve elem."
+
+#: admin/admin-core.php:328
+msgid "Unauthorized"
+msgstr "Jogosulatlan hozzáférés"
+
+#: admin/admin-core.php:341
+msgid "Invalid parameters"
+msgstr "Érvénytelen paraméterek"
+
+#: admin/admin-core.php:443
+msgid "Post Meta list"
+msgstr "Post Meta lista"
+
+#: admin/page-dashboard.php:52
+msgid "Always make a backup before modifying or deleting data!"
+msgstr "Módosítás vagy törlés előtt mindig szükséges biztonsági mentés készítése!"
+
+#: admin/page-dashboard.php:61 admin/page-dashboard.php:267
+msgid "Select bulk action"
+msgstr "Csoportos művelet kiválasztása"
+
+#: admin/page-dashboard.php:63 admin/page-dashboard.php:269
+msgid "Bulk actions"
+msgstr "Csoportos műveletek"
+
+#: admin/page-dashboard.php:64 admin/page-dashboard.php:232
+#: admin/page-dashboard.php:270
+msgid "Delete (key + value)"
+msgstr "Törlés (kulcs + érték)"
+
+#: admin/page-dashboard.php:65 admin/page-dashboard.php:233
+#: admin/page-dashboard.php:271
+msgid "Delete (value only)"
+msgstr "Törlés (csak érték)"
+
+#: admin/page-dashboard.php:75 admin/page-dashboard.php:281
+#, php-format
+msgid "%s item"
+msgid_plural "%s items"
+msgstr[0] "%s elem"
+msgstr[1] "%s elem"
+
+#: admin/page-dashboard.php:85 admin/page-dashboard.php:110
+msgid "Previous page"
+msgstr "Előző oldal"
+
+#: admin/page-dashboard.php:86 admin/page-dashboard.php:133
+#: admin/page-dashboard.php:139
+msgid "Next page"
+msgstr "Következő oldal"
+
+#: admin/page-dashboard.php:104 admin/page-dashboard.php:293
+msgid "First page"
+msgstr "Első oldal"
+
+#: admin/page-dashboard.php:123 admin/page-dashboard.php:314
+#, php-format
+msgid "%1$s of %2$s"
+msgstr "%1$s / %2$s"
+
+#: admin/page-dashboard.php:119 admin/page-dashboard.php:310
+msgid "Current Page"
+msgstr "Aktuális oldal"
+
+#: admin/page-dashboard.php:139 admin/page-dashboard.php:322
+#: admin/page-dashboard.php:328
+msgid "Last page"
+msgstr "Utolsó oldal"
+
+#: admin/page-dashboard.php:159
+msgid "Select All"
+msgstr "Összes kijelölése"
+
+#: admin/page-dashboard.php:162 admin/page-dashboard.php:199
+msgid "Meta Key"
+msgstr "Meta kulcs"
+
+#: admin/page-dashboard.php:163 admin/page-dashboard.php:200
+msgid "Source"
+msgstr "Forrás"
+
+#: admin/page-dashboard.php:164 admin/page-dashboard.php:201
+msgid "Post Type"
+msgstr "Bejegyzés típus"
+
+#: admin/page-dashboard.php:165 admin/page-dashboard.php:202
+msgid "Count"
+msgstr "Darabszám"
+
+#: admin/page-dashboard.php:166 admin/page-dashboard.php:217
+msgid "Field content"
+msgstr "Mező tartalma"
+
+#: admin/page-dashboard.php:167 admin/page-dashboard.php:220
+msgid "Edit actions"
+msgstr "Szerkesztési műveletek"
+
+#: admin/page-dashboard.php:168 admin/page-dashboard.php:229
+msgid "Delete actions"
+msgstr "Törlési műveletek"
+
+#: admin/page-dashboard.php:174
+msgid "No post meta data found."
+msgstr "Nem található post meta adat."
+
+#: admin/page-dashboard.php:195
+msgid "Bulk select"
+msgstr "Csoportos kijelölés"
+
+#: admin/page-dashboard.php:222 admin/page-dashboard.php:231
+msgid "Choose…"
+msgstr "Kiválasztás…"
+
+#: admin/page-dashboard.php:223 admin/page-help.php:84
+msgid "Overwrite"
+msgstr "Felülírás"
+
+#: admin/page-dashboard.php:224 admin/page-help.php:89
+msgid "Search and replace (only value)"
+msgstr "Keresés és csere (csak érték)"
+
+#: admin/page-dashboard.php:225 admin/page-help.php:94
+msgid "Search and replace (name and value)"
+msgstr "Keresés és csere (név és érték)"
+
+#: admin/page-help.php:15
+msgid "Frequently Asked Questions"
+msgstr "Gyakran ismételt kérdések"
+
+#: admin/page-help.php:20
+msgid "Do I need to create a backup before using this plugin?"
+msgstr "Biztonsági mentés szükséges a bővítmény használata előtt?"
+
+#: admin/page-help.php:23
+msgid "Yes — always create a full database backup before deleting any post meta data. Deletions are permanent and cannot be undone without a backup."
+msgstr "Igen — törlés előtt mindig szükséges teljes adatbázis-mentés készítése. A törlés végleges, visszavonás csak mentésből lehetséges."
+
+#: admin/page-help.php:24
+msgid "You can create a backup using a backup plugin (e.g. UpdraftPlus, All-in-One WP Migration) or directly from phpMyAdmin by exporting your database."
+msgstr "A biztonsági mentés készíthető backup bővítménnyel (pl. UpdraftPlus, All-in-One WP Migration) vagy közvetlenül phpMyAdmin-ben az adatbázis exportálásával."
+
+#: admin/page-help.php:31
+msgid "Can a deletion be undone?"
+msgstr "A törlés visszavonható?"
+
+#: admin/page-help.php:34
+msgid "No. Deletions are irreversible and can only be restored from a database backup."
+msgstr "Nem. A törlés visszavonhatatlan, helyreállítás csak adatbázis-mentésből lehetséges."
+
+#: admin/page-help.php:41
+msgid "The operation is very slow or seems to be stuck — what should I do?"
+msgstr "A művelet lassú vagy megakadt — mi a teendő?"
+
+#: admin/page-help.php:44
+msgid "The plugin processes posts in batches. If the operation is slow or appears to hang, reduce the batch size in the Settings page."
+msgstr "A bővítmény kötegekben dolgozza fel a bejegyzéseket. Lassú vagy megakadt művelet esetén csökkentse a kötegméretet a Beállítások oldalon."
+
+#: admin/page-help.php:45
+msgid "Lower the \"Process Speed\" value (e.g. from 50 to 10–20). This reduces the number of posts processed per request, which lowers the load on your server."
+msgstr "A „Feldolgozási sebesség” érték csökkentése (pl. 50-ről 10–20-ra) csökkenti kérésenként feldolgozott bejegyzések számát, ezzel a szerver terhelését."
+
+#: admin/page-help.php:52
+msgid "What is the difference between \"Delete (key + value)\" and \"Delete (value only)\"?"
+msgstr "Mi a különbség a „Törlés (kulcs + érték)” és a „Törlés (csak érték)” között?"
+
+#: admin/page-help.php:56
+msgid "Delete (key + value):"
+msgstr "Törlés (kulcs + érték):"
+
+#: admin/page-help.php:58
+msgid "Permanently removes the meta key and all its values from every post. The key will no longer appear in the table."
+msgstr "A meta kulcs és minden értéke véglegesen törlődik minden bejegyzésből. A kulcs többé nem jelenik meg a táblázatban."
+
+#: admin/page-help.php:61
+msgid "Delete (value only):"
+msgstr "Törlés (csak érték):"
+
+#: admin/page-help.php:63
+msgid "Clears the stored value but keeps the meta key in the database. The key remains visible in the table with a count of 0."
+msgstr "A tárolt érték törlődik, a meta kulcs megmarad. A kulcs a táblázatban 0 darabszámmal továbbra is látható."
+
+#: admin/page-help.php:70
+msgid "What does the \"Count\" column show?"
+msgstr "Mit mutat a „Darabszám” oszlop?"
+
+#: admin/page-help.php:73
+msgid "The Count column shows the number of posts that have a non-empty value stored for the given meta key. Posts that have the key but an empty value are not counted."
+msgstr "A Darabszám oszlop a nem üres értékkel rendelkező bejegyzések számát mutatja az adott meta kulcshoz. Az üres értékű bejegyzések nem számítanak bele."
+
+#: admin/page-help.php:80
+msgid "What are the Edit actions (Overwrite, Search and replace)?"
+msgstr "Mik a szerkesztési műveletek (Felülírás, Keresés és csere)?"
+
+#: admin/page-help.php:86
+msgid "Replaces the full post meta field content for all posts with the new value you enter. Use this when you want to set the same value everywhere."
+msgstr "A post meta mező teljes tartalma lecserélődik az új értékre minden bejegyzésben. Ugyanazon érték beállításához mindenhol használható."
+
+#: admin/page-help.php:91
+msgid "Finds and replaces text only in the stored values. Array keys (names) in serialized data remain unchanged. Works on both plain text and serialized arrays."
+msgstr "Keresés és csere csak a tárolt értékekben. A serialized adatok kulcsai változatlanok maradnak. Egyszerű szövegen és serialized tömbökön egyaránt működik."
+
+#: admin/page-help.php:96
+msgid "Finds and replaces text in both values and array keys within serialized data. Use this when you need to rename keys (e.g. pa_color to pa_color2) in addition to values."
+msgstr "Keresés és csere az értékekben és a kulcsokban egyaránt. Kulcsok átnevezéséhez (pl. pa_color → pa_color2) és értékek cseréjéhez."
+
+#: admin/page-settings.php:33
+msgid "Settings saved."
+msgstr "Beállítások mentve."
+
+#: admin/page-settings.php:49
+msgid "Process speed"
+msgstr "Feldolgozási sebesség"
+
+#: admin/page-settings.php:62
+msgid "If you experience errors or timeouts, decrease this value and try again. Only set to high values if you know what you are doing."
+msgstr "Hiba vagy időtúllépés esetén az érték csökkentése és újrapróbálás ajánlott. Magas érték csak tapasztalt felhasználóknak, erős szerveren ajánlott."
+
+#: admin/page-settings.php:68
+msgid "Items per page"
+msgstr "Elemek oldalanként"
+
+#: admin/page-settings.php:81
+msgid "Specify how many meta keys to display per page. Not recommended to set too high, only on powerful servers."
+msgstr "Oldalanként megjelenítendő meta kulcsok száma. Magas érték csak erős szerveren ajánlott."
+
+#: admin/page-settings.php:87
+msgid "Uninstall"
+msgstr "Eltávolítás"
+
+#: admin/page-settings.php:98
+msgid "Remove plugin settings and custom data when you delete this plugin from the plugin list."
+msgstr "Bővítmény beállításainak és egyéni adatainak törlése a plugin listából való eltávolításkor."
