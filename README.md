@@ -86,24 +86,4 @@ The plugin processes posts in batches. If the operation is slow or appears to ha
 
 ## Changelog
 
-### 1.1.0
-
-- Minor code fix.
-- WordPress 7.0 compatibility check
-- PHP 8.5 compatibility check
-
-### 1.0.0
-
-- Initial release.
-
----
-
-## Upgrade notice
-
-### 1.1.0
-
-- Minor code fix.
-- WordPress 7.0 compatibility check
-- PHP 8.5 compatibility check
-
-**1.0.0** — Initial release.
+[Changelog is there](https://wordpress.org/plugins/rotistudio-post-meta-editor-cleaner/#developers)
