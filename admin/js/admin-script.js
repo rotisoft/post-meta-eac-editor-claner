@@ -59,12 +59,15 @@
 					return;
 				}
 
-				var data      = response.data;
-				var newOffset = offset + data.processed;
+			var data = response.data;
+			// For destructive actions (delete/delete_value) rows are removed from the
+			// result set after each batch, so always restart from offset 0. For other
+			// actions (overwrite, search_replace) advance the offset normally.
+			var newOffset = data.destructive ? 0 : offset + data.processed;
 
-				if ( data.has_more ) {
-					processMeta( metaKey, actionType, newOffset, statusEl, callback, extraData );
-				} else {
+			if ( data.has_more ) {
+				processMeta( metaKey, actionType, newOffset, statusEl, callback, extraData );
+			} else {
 					statusEl.text( rspmeacData.i18n.done );
 					if ( 'function' === typeof callback ) {
 						callback( true, data );
@@ -308,8 +311,9 @@
 		$( '.rspmeac-edit-actions-select' ).on( 'change', function () {
 			var action   = $( this ).val();
 			var $select  = $( this );
-			var metaKey  = $select.data( 'key' );
-			var $editRow = $( '.rspmeac-inline-edit-row[data-key="' + metaKey + '"]' );
+			// Use DOM traversal instead of an attribute selector to avoid breakage
+			// when the meta key contains CSS-special characters (quotes, brackets…).
+			var $editRow = $select.closest( 'tr' ).next( '.rspmeac-inline-edit-row' );
 
 			if ( '' === action ) {
 				return;

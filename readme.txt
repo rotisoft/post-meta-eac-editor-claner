@@ -2,9 +2,9 @@
 Contributors: rtomo, rotistudio
 Tags: post meta, cleanup, database, optimization, editor
 Requires at least: 5.9
-Tested up to: 6.9
+Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Donate link: https://rotistudio.com/contact/
@@ -76,10 +76,20 @@ The plugin processes posts in batches. If the operation is slow or appears to ha
 
 == Changelog ==
 
+= 1.1.0 =
+* Minor code fix.
+* WordPress 7.0 compatibility check
+* PHP 8.5 compatibility check
+
 = 1.0.0 =
 * Initial release.
 
 == Upgrade Notice ==
+
+= 1.1.0 =
+* Minor code fix.
+* WordPress 7.0 compatibility check
+* PHP 8.5 compatibility check
 
 = 1.0.0 =
 Initial release.

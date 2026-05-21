@@ -3,7 +3,7 @@
  * Plugin Name: Post Meta Editor and Cleaner by RotiStudio
  * Plugin URI: https://rotistudio.com/plugins/post-meta-eac-editor-cleaner/
  * Description: Post Meta bulk editor to delete unused data, overwrite values, run search and replace, and clean your database directly from the admin panel.
- * Version: 1.0.0
+ * Version: 1.1.0
  * Requires at least: 5.9
  * Requires PHP: 7.4
  * Author: RotiStudio - Tamas Rottenbacher
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'RSPMEAC_VERSION', '1.0.0' );
+define( 'RSPMEAC_VERSION', '1.1.0' );
 define( 'RSPMEAC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'RSPMEAC_URL', plugin_dir_url( __FILE__ ) );
 

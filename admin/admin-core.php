@@ -361,12 +361,18 @@ function rspmeac_ajax_process_meta() {
 		wp_send_json_error( array( 'message' => __( 'Invalid parameters', 'rotistudio-post-meta-editor-cleaner' ) ) );
 	}
 
+	$is_search_replace = in_array( $action_type, array( 'search_replace_value', 'search_replace_value_and_key' ), true );
+	if ( $is_search_replace && '' === $search_value ) {
+		wp_send_json_error( array( 'message' => __( 'Invalid parameters', 'rotistudio-post-meta-editor-cleaner' ) ) );
+	}
+
 	global $wpdb;
 
 	$limit = absint( get_option( 'rspmeac_process_speed', 50 ) );
 	if ( 0 === $limit ) {
 		$limit = 50;
 	}
+	$limit = min( $limit, 500 );
 
 	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Admin operation, wp_postmeta has a native meta_key index.
 	$posts_with_meta = $wpdb->get_col(
@@ -407,11 +413,13 @@ function rspmeac_ajax_process_meta() {
 		$processed_count++;
 	}
 
-	$response_data = array(
-		'processed' => $processed_count,
-		'has_more'  => count( $posts_with_meta ) === $limit,
-		'meta_key'  => $meta_key,
-		'action'    => $action_type,
+	$is_destructive = in_array( $action_type, array( 'delete', 'delete_value' ), true );
+	$response_data  = array(
+		'processed'    => $processed_count,
+		'has_more'     => count( $posts_with_meta ) === $limit,
+		'destructive'  => $is_destructive,
+		'meta_key'     => $meta_key,
+		'action'       => $action_type,
 	);
 
 	if ( 'overwrite' === $action_type ) {
@@ -476,4 +484,4 @@ function rspmeac_plugin_action_links( $links ) {
 
 	return array_merge( $custom_links, $links );
 }
-add_filter( 'plugin_action_links_post-meta-eac-rotistudio/post-meta-eac-rotistudio.php', 'rspmeac_plugin_action_links', 10 );
+add_filter( 'plugin_action_links_' . plugin_basename( RSPMEAC_PATH . 'post-meta-eac-rotistudio.php' ), 'rspmeac_plugin_action_links', 10 );

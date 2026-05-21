@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Save settings.
-if ( isset( $_POST['submit'], $_POST['rspmeac_settings_nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['rspmeac_settings_nonce'] ) ), 'rspmeac_settings' ) ) {
+if ( isset( $_POST['submit'], $_POST['rspmeac_settings_nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['rspmeac_settings_nonce'] ) ), 'rspmeac_settings' ) && current_user_can( 'manage_options' ) ) {
 	$rspmeac_process_speed  = isset( $_POST['rspmeac_process_speed'] ) ? absint( $_POST['rspmeac_process_speed'] ) : 100;
 	$rspmeac_items_per_page = isset( $_POST['rspmeac_items_per_page'] ) ? absint( $_POST['rspmeac_items_per_page'] ) : 40;
 	$rspmeac_delete_data    = isset( $_POST['rspmeac_delete_data_on_uninstall'] ) ? 1 : 0;

@@ -37,7 +37,7 @@ foreach ( $rspmeac_type_rows as $rspmeac_row ) {
 }
 
 // Pagination settings.
-$per_page              = get_option( 'rspmeac_items_per_page', 40 );
+$per_page              = max( 1, intval( get_option( 'rspmeac_items_per_page', 40 ) ) );
 $rspmeac_current_page  = isset( $_GET['paged'] ) ? max( 1, absint( $_GET['paged'] ) ) : 1; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Pagination, no state change.
 $rspmeac_total_items   = count( $rspmeac_meta_keys );
 $rspmeac_total_pages   = ceil( $rspmeac_total_items / $per_page );
@@ -46,6 +46,27 @@ $rspmeac_offset        = ( $rspmeac_current_page - 1 ) * $per_page;
 // Select meta keys for current page.
 $rspmeac_paged_meta_keys = array_slice( $rspmeac_meta_keys, $rspmeac_offset, $per_page );
 
+// Prefetch sample values for all visible keys in a single query instead of N+1.
+$rspmeac_sample_values = array();
+if ( ! empty( $rspmeac_paged_meta_keys ) ) {
+	$rspmeac_placeholders = implode( ', ', array_fill( 0, count( $rspmeac_paged_meta_keys ), '%s' ) );
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- Admin page, variable placeholder count, meta_key index.
+	$rspmeac_sample_rows = $wpdb->get_results(
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Placeholder count is dynamic but safe via array_fill.
+		$wpdb->prepare(
+			"SELECT meta_key, meta_value
+			FROM {$wpdb->postmeta}
+			WHERE meta_key IN ( $rspmeac_placeholders )
+			AND meta_value != ''
+			GROUP BY meta_key",
+			$rspmeac_paged_meta_keys
+		)
+	);
+	foreach ( $rspmeac_sample_rows as $rspmeac_sample_row ) {
+		$rspmeac_sample_values[ $rspmeac_sample_row->meta_key ] = $rspmeac_sample_row->meta_value;
+	}
+}
+
 ?>
 
 <div class="rspmeac-notice-error">
@@ -53,8 +74,6 @@ $rspmeac_paged_meta_keys = array_slice( $rspmeac_meta_keys, $rspmeac_offset, $pe
 </div>
 
 <form method="post" id="rspmeac-meta-form">
-	<?php wp_nonce_field( 'rspmeac_bulk_action', 'rspmeac_bulk_nonce' ); ?>
-	<input type="hidden" name="bulk_action" value="1" />
 
 	<div class="tablenav top">
 		<div class="alignleft actions bulkactions">
@@ -178,13 +197,7 @@ $rspmeac_paged_meta_keys = array_slice( $rspmeac_meta_keys, $rspmeac_offset, $pe
 		<?php else : ?>
 			<?php foreach ( $rspmeac_paged_meta_keys as $rspmeac_key ) : ?>
 				<?php
-				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Admin page, sample value query.
-				$rspmeac_sample = $wpdb->get_var(
-					$wpdb->prepare(
-						"SELECT meta_value FROM {$wpdb->postmeta} WHERE meta_key = %s AND meta_value != '' LIMIT 1",
-						$rspmeac_key
-					)
-				);
+				$rspmeac_sample         = isset( $rspmeac_sample_values[ $rspmeac_key ] ) ? $rspmeac_sample_values[ $rspmeac_key ] : null;
 				$rspmeac_sample_display = ( null !== $rspmeac_sample ) ? mb_strimwidth( $rspmeac_sample, 0, 100, '…' ) : '';
 
 				// Post types and count summary.
