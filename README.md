@@ -7,7 +7,7 @@ Post Meta bulk editor to delete unused data, overwrite values, run search and re
 | | |
 | --- | --- |
 | **Requires WordPress** | 5.9+ |
-| **Tested up to** | 6.9 |
+| **Tested up to** | 7.0 |
 | **Requires PHP** | 7.4+ |
 | **Stable tag** | 1.0.0 |
 | **License** | [GPLv2 or later](https://www.gnu.org/licenses/gpl-2.0.html) |
@@ -86,6 +86,12 @@ The plugin processes posts in batches. If the operation is slow or appears to ha
 
 ## Changelog
 
+### 1.1.0
+
+- Minor code fix.
+- WordPress 7.0 compatibility check
+- PHP 8.5 compatibility check
+
 ### 1.0.0
 
 - Initial release.
@@ -93,5 +99,11 @@ The plugin processes posts in batches. If the operation is slow or appears to ha
 ---
 
 ## Upgrade notice
+
+### 1.1.0
+
+- Minor code fix.
+- WordPress 7.0 compatibility check
+- PHP 8.5 compatibility check
 
 **1.0.0** — Initial release.
