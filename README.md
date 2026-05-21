@@ -9,7 +9,7 @@ Post Meta bulk editor to delete unused data, overwrite values, run search and re
 | **Requires WordPress** | 5.9+ |
 | **Tested up to** | 7.0 |
 | **Requires PHP** | 7.4+ |
-| **Stable tag** | 1.0.0 |
+| **Stable tag** | 1.1.0 |
 | **License** | [GPLv2 or later](https://www.gnu.org/licenses/gpl-2.0.html) |
 
 **Contributors:** rtomo, rotistudio  
