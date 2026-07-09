@@ -221,6 +221,22 @@ function rspmeac_get_admin_nav_links() {
 }
 
 /**
+ * Build the canonical admin URL for a plugin page.
+ *
+ * The main page is registered under Tools, so its canonical URL uses
+ * tools.php (this also keeps the Tools menu highlighted). The hidden
+ * Settings and Help pages are only reachable via admin.php.
+ *
+ * @param string $slug Page slug.
+ * @return string Admin URL for the page.
+ */
+function rspmeac_get_admin_page_url( $slug ) {
+	$parent = ( 'rspmeac-main' === $slug ) ? 'tools.php' : 'admin.php';
+
+	return admin_url( $parent . '?page=' . $slug );
+}
+
+/**
  * Determine the current admin page slug.
  *
  * @return string The current page slug.
@@ -251,7 +267,7 @@ function rspmeac_render_admin_wrapper( $page_file ) {
 			<nav class="rspmeac-admin-nav">
 				<?php
 				foreach ( $nav_links as $slug => $label ) {
-					$url          = admin_url( 'admin.php?page=' . $slug );
+					$url          = rspmeac_get_admin_page_url( $slug );
 					$active_class = ( $current_slug === $slug ) ? ' rspmeac-admin-nav-active' : '';
 
 					printf(
@@ -277,7 +293,8 @@ function rspmeac_render_admin_wrapper( $page_file ) {
 
 		<div class="rspmeac-admin-footer">
 			<?php
-			$plugin_data = get_plugin_data( RSPMEAC_PATH . 'post-meta-eac-rotistudio.php' );
+			// Skip markup translation and textdomain loading; header parsing only.
+			$plugin_data = get_plugin_data( RSPMEAC_PATH . 'post-meta-eac-rotistudio.php', false, false );
 
 			printf(
 				'%s - %s - by RotiStudio.com - <a href="%s" target="_blank" rel="noopener">%s</a>',
@@ -294,31 +311,37 @@ function rspmeac_render_admin_wrapper( $page_file ) {
 
 
 /**
- * Bulk action notice megjelenítése a dashboard oldalon.
+ * Handle the "Refresh data" action on the dashboard before any output.
+ *
+ * Runs on the load-{page} hook so a redirect is still possible; this keeps
+ * the refresh parameters out of the URL used by the pagination links.
  *
  * @return void
  */
-function rspmeac_admin_notices() {
-	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Notice megjelenítés, nincs állapotváltozás.
-	if ( ! isset( $_GET['page'] ) || 'rspmeac-main' !== $_GET['page'] ) {
+function rspmeac_handle_overview_refresh() {
+	if ( ! isset( $_GET['rspmeac_refresh'], $_GET['_wpnonce'] ) ) {
 		return;
 	}
 
-	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Notice megjelenítés.
-	if ( isset( $_GET['bulk_error'] ) ) {
-		echo '<div class="notice notice-error is-dismissible"><p>' . esc_html__( 'Invalid bulk action or no items selected.', 'rotistudio-post-meta-editor-cleaner' ) . '</p></div>';
+	if ( ! current_user_can( 'manage_options' ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), 'rspmeac_refresh' ) ) {
+		return;
 	}
+
+	delete_transient( 'rspmeac_meta_overview' );
+
+	wp_safe_redirect( remove_query_arg( array( 'rspmeac_refresh', '_wpnonce' ) ) );
+	exit;
 }
-add_action( 'admin_notices', 'rspmeac_admin_notices', 10 );
+add_action( 'load-tools_page_rspmeac-main', 'rspmeac_handle_overview_refresh', 10 );
 
 /**
- * Rekurzívan alkalmazza a keresés-csere műveletet serialized adatokon.
+ * Recursively apply search & replace on unserialized data.
  *
- * @param mixed  $value           Bármilyen érték (string, tömb, stb.).
- * @param string $search          Keresendő szöveg.
- * @param string $replace         Csere szöveg.
- * @param bool   $replace_in_keys Ha true, tömb kulcsokban is cserél.
- * @return mixed A módosított érték.
+ * @param mixed  $value           Any value (string, array, etc.).
+ * @param string $search          Text to search for.
+ * @param string $replace         Replacement text.
+ * @param bool   $replace_in_keys When true, string array keys are replaced too.
+ * @return mixed The modified value.
  */
 function rspmeac_replace_in_serialized( $value, $search, $replace, $replace_in_keys = false ) {
 	if ( is_string( $value ) ) {
@@ -336,7 +359,58 @@ function rspmeac_replace_in_serialized( $value, $search, $replace, $replace_in_k
 }
 
 /**
- * AJAX handler: kötegelt meta adat törlés / érték törlés.
+ * Run search & replace on every meta row of a post for a given key.
+ *
+ * Rows are processed individually by meta_id so posts holding multiple rows
+ * for the same key keep their distinct values instead of collapsing into the
+ * first value (which is what update_post_meta() without $prev_value would do).
+ *
+ * @param int    $post_id         Post ID.
+ * @param string $meta_key        Meta key to process.
+ * @param string $search          Text to search for.
+ * @param string $replace         Replacement text.
+ * @param bool   $replace_in_keys Whether to also replace inside array keys.
+ * @return void
+ */
+function rspmeac_search_replace_post_meta( $post_id, $meta_key, $search, $replace, $replace_in_keys ) {
+	global $wpdb;
+
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- meta_id is required for per-row updates; indexed lookup, admin operation.
+	$meta_rows = $wpdb->get_results(
+		$wpdb->prepare(
+			"SELECT meta_id, meta_value FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = %s",
+			$post_id,
+			$meta_key
+		)
+	);
+
+	foreach ( $meta_rows as $meta_row ) {
+		// Raw DB value: a single maybe_unserialize() is correct here. Reading
+		// through get_post_meta() and unserializing again would corrupt
+		// double-serialized data.
+		$value = maybe_unserialize( $meta_row->meta_value );
+
+		if ( is_array( $value ) ) {
+			$updated = rspmeac_replace_in_serialized( $value, $search, $replace, $replace_in_keys );
+
+			if ( $updated !== $value ) {
+				update_metadata_by_mid( 'post', $meta_row->meta_id, $updated );
+			}
+		} elseif ( is_scalar( $value ) ) {
+			$original = (string) $value;
+			$updated  = str_replace( $search, $replace, $original );
+
+			if ( $updated !== $original ) {
+				update_metadata_by_mid( 'post', $meta_row->meta_id, $updated );
+			}
+		}
+		// Objects are skipped on purpose: rewriting class instances via string
+		// replacement could corrupt them.
+	}
+}
+
+/**
+ * AJAX handler: batched post meta delete / edit operations.
  *
  * @return void
  */
@@ -348,16 +422,23 @@ function rspmeac_ajax_process_meta() {
 		wp_send_json_error( array( 'message' => __( 'Unauthorized', 'rotistudio-post-meta-editor-cleaner' ) ) );
 	}
 
-	$meta_key      = isset( $_POST['meta_key'] ) ? sanitize_text_field( wp_unslash( $_POST['meta_key'] ) ) : '';
+	// Meta keys and values must be preserved verbatim (HTML, percent-encoded
+	// sequences, backslashes…), otherwise the sanitized string no longer
+	// matches the data stored in the database. They are validated as UTF-8
+	// only and used exclusively through $wpdb->prepare() and the meta API,
+	// both of which are injection-safe. Output is escaped elsewhere.
+	// phpcs:disable WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+	$meta_key      = isset( $_POST['meta_key'] ) && is_string( $_POST['meta_key'] ) ? wp_check_invalid_utf8( wp_unslash( $_POST['meta_key'] ) ) : '';
 	$action_type   = isset( $_POST['action_type'] ) ? sanitize_text_field( wp_unslash( $_POST['action_type'] ) ) : '';
 	$offset        = isset( $_POST['offset'] ) ? absint( $_POST['offset'] ) : 0;
-	$new_value     = isset( $_POST['new_value'] ) ? sanitize_textarea_field( wp_unslash( $_POST['new_value'] ) ) : '';
-	$search_value  = isset( $_POST['search_value'] ) ? sanitize_textarea_field( wp_unslash( $_POST['search_value'] ) ) : '';
-	$replace_value = isset( $_POST['replace_value'] ) ? sanitize_textarea_field( wp_unslash( $_POST['replace_value'] ) ) : '';
+	$new_value     = isset( $_POST['new_value'] ) && is_string( $_POST['new_value'] ) ? wp_check_invalid_utf8( wp_unslash( $_POST['new_value'] ) ) : '';
+	$search_value  = isset( $_POST['search_value'] ) && is_string( $_POST['search_value'] ) ? wp_check_invalid_utf8( wp_unslash( $_POST['search_value'] ) ) : '';
+	$replace_value = isset( $_POST['replace_value'] ) && is_string( $_POST['replace_value'] ) ? wp_check_invalid_utf8( wp_unslash( $_POST['replace_value'] ) ) : '';
+	// phpcs:enable WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
 	$allowed_actions = array( 'delete', 'delete_value', 'overwrite', 'search_replace_value', 'search_replace_value_and_key' );
 
-	if ( empty( $meta_key ) || ! in_array( $action_type, $allowed_actions, true ) ) {
+	if ( '' === $meta_key || ! in_array( $action_type, $allowed_actions, true ) ) {
 		wp_send_json_error( array( 'message' => __( 'Invalid parameters', 'rotistudio-post-meta-editor-cleaner' ) ) );
 	}
 
@@ -374,52 +455,62 @@ function rspmeac_ajax_process_meta() {
 	}
 	$limit = min( $limit, 500 );
 
-	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Admin operation, wp_postmeta has a native meta_key index.
-	$posts_with_meta = $wpdb->get_col(
-		$wpdb->prepare(
-			"SELECT DISTINCT pm.post_id
-			FROM {$wpdb->postmeta} pm
-			INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
-			WHERE pm.meta_key = %s
-			AND p.post_status NOT IN ('trash', 'auto-draft')
-			LIMIT %d OFFSET %d",
-			$meta_key,
-			$limit,
-			$offset
-		)
-	);
+	$sql = "SELECT DISTINCT pm.post_id
+		FROM {$wpdb->postmeta} pm
+		INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
+		WHERE pm.meta_key = %s
+		AND p.post_status NOT IN ('trash', 'auto-draft')";
 
+	// Only select rows that still need clearing. Without this filter the
+	// already processed posts (key re-added with an empty value) would keep
+	// matching and the restart-from-zero batch loop could never finish.
+	if ( 'delete_value' === $action_type ) {
+		$sql .= " AND pm.meta_value != ''";
+	}
+
+	// Deterministic order so LIMIT/OFFSET pagination cannot skip or repeat posts.
+	$sql .= ' ORDER BY pm.post_id ASC LIMIT %d OFFSET %d';
+
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Admin operation; $sql contains static fragments only, values go through prepare(); wp_postmeta has a native meta_key index.
+	$posts_with_meta = $wpdb->get_col( $wpdb->prepare( $sql, $meta_key, $limit, $offset ) );
+
+	// The delete_post_meta() / update_post_meta() / add_post_meta() wrappers
+	// silently redirect revision IDs to the parent post (wp_is_post_revision),
+	// so meta rows stored on revisions (e.g. Elementor copies its meta onto
+	// every revision) could never be deleted and the calls returned false.
+	// The lower-level *_metadata() functions operate on the exact post ID.
 	$processed_count = 0;
 	foreach ( $posts_with_meta as $post_id ) {
 		if ( 'delete' === $action_type ) {
-			delete_post_meta( $post_id, $meta_key );
+			delete_metadata( 'post', $post_id, wp_slash( $meta_key ) );
 		} elseif ( 'delete_value' === $action_type ) {
-			delete_post_meta( $post_id, $meta_key );
-			add_post_meta( $post_id, $meta_key, '', true );
+			delete_metadata( 'post', $post_id, wp_slash( $meta_key ) );
+			add_metadata( 'post', $post_id, wp_slash( $meta_key ), '', true );
 		} elseif ( 'overwrite' === $action_type ) {
-			update_post_meta( $post_id, $meta_key, $new_value );
-		} elseif ( 'search_replace_value' === $action_type || 'search_replace_value_and_key' === $action_type ) {
-			$current          = get_post_meta( $post_id, $meta_key, true );
-			$unserialized     = maybe_unserialize( $current );
-			$replace_in_keys  = ( 'search_replace_value_and_key' === $action_type );
-			if ( is_array( $unserialized ) ) {
-				$updated = rspmeac_replace_in_serialized( $unserialized, $search_value, $replace_value, $replace_in_keys );
-				update_post_meta( $post_id, $meta_key, $updated );
-			} elseif ( is_scalar( $unserialized ) ) {
-				$updated = str_replace( $search_value, $replace_value, (string) $unserialized );
-				update_post_meta( $post_id, $meta_key, $updated );
-			}
+			// The meta API expects slashed input; without wp_slash() any
+			// legitimate backslash in the value would be stripped on save.
+			update_metadata( 'post', $post_id, wp_slash( $meta_key ), wp_slash( $new_value ) );
+		} elseif ( $is_search_replace ) {
+			rspmeac_search_replace_post_meta( $post_id, $meta_key, $search_value, $replace_value, ( 'search_replace_value_and_key' === $action_type ) );
 		}
 		$processed_count++;
 	}
 
+	// The cached overview table is now stale.
+	if ( $processed_count > 0 ) {
+		delete_transient( 'rspmeac_meta_overview' );
+	}
+
 	$is_destructive = in_array( $action_type, array( 'delete', 'delete_value' ), true );
 	$response_data  = array(
-		'processed'    => $processed_count,
-		'has_more'     => count( $posts_with_meta ) === $limit,
-		'destructive'  => $is_destructive,
-		'meta_key'     => $meta_key,
-		'action'       => $action_type,
+		'processed'   => $processed_count,
+		'has_more'    => count( $posts_with_meta ) === $limit,
+		// Destructive batches restart from the beginning because processed
+		// rows drop out of the result set; other actions continue where the
+		// previous batch stopped.
+		'next_offset' => $is_destructive ? 0 : $offset + $processed_count,
+		'meta_key'    => $meta_key,
+		'action'      => $action_type,
 	);
 
 	if ( 'overwrite' === $action_type ) {
@@ -467,17 +558,17 @@ function rspmeac_plugin_action_links( $links ) {
 	$custom_links = array(
 		sprintf(
 			'<a href="%s">%s</a>',
-			esc_url( admin_url( 'admin.php?page=rspmeac-main' ) ),
+			esc_url( rspmeac_get_admin_page_url( 'rspmeac-main' ) ),
 			esc_html__( 'Post Meta list', 'rotistudio-post-meta-editor-cleaner' )
 		),
 		sprintf(
 			'<a href="%s">%s</a>',
-			esc_url( admin_url( 'admin.php?page=rspmeac-settings' ) ),
+			esc_url( rspmeac_get_admin_page_url( 'rspmeac-settings' ) ),
 			esc_html__( 'Settings', 'rotistudio-post-meta-editor-cleaner' )
 		),
 		sprintf(
 			'<a href="%s">%s</a>',
-			esc_url( admin_url( 'admin.php?page=rspmeac-help' ) ),
+			esc_url( rspmeac_get_admin_page_url( 'rspmeac-help' ) ),
 			esc_html__( 'Help', 'rotistudio-post-meta-editor-cleaner' )
 		),
 	);

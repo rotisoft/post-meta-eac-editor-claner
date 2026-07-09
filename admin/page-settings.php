@@ -11,14 +11,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Save settings.
 if ( isset( $_POST['submit'], $_POST['rspmeac_settings_nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['rspmeac_settings_nonce'] ) ), 'rspmeac_settings' ) && current_user_can( 'manage_options' ) ) {
-	$rspmeac_process_speed  = isset( $_POST['rspmeac_process_speed'] ) ? absint( $_POST['rspmeac_process_speed'] ) : 100;
+	$rspmeac_process_speed  = isset( $_POST['rspmeac_process_speed'] ) ? absint( $_POST['rspmeac_process_speed'] ) : 50;
 	$rspmeac_items_per_page = isset( $_POST['rspmeac_items_per_page'] ) ? absint( $_POST['rspmeac_items_per_page'] ) : 40;
 	$rspmeac_delete_data    = isset( $_POST['rspmeac_delete_data_on_uninstall'] ) ? 1 : 0;
 
-	// Validation.
+	// Validation. Default 50 matches the AJAX handler's fallback.
 	$rspmeac_allowed_speeds = array( 1, 5, 10, 20, 50, 100, 500 );
 	if ( ! in_array( $rspmeac_process_speed, $rspmeac_allowed_speeds, true ) ) {
-		$rspmeac_process_speed = 100;
+		$rspmeac_process_speed = 50;
 	}
 
 	if ( $rspmeac_items_per_page < 10 || $rspmeac_items_per_page > 500 ) {
@@ -34,7 +34,7 @@ if ( isset( $_POST['submit'], $_POST['rspmeac_settings_nonce'] ) && wp_verify_no
 }
 
 // Get current values (with default values).
-$rspmeac_process_speed  = get_option( 'rspmeac_process_speed', 100 );
+$rspmeac_process_speed  = get_option( 'rspmeac_process_speed', 50 );
 $rspmeac_items_per_page = get_option( 'rspmeac_items_per_page', 40 );
 $rspmeac_delete_data    = get_option( 'rspmeac_delete_data_on_uninstall', false );
 ?>

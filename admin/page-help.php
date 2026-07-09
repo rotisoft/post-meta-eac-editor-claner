@@ -1,6 +1,6 @@
 <?php
 /**
- * Help oldal tartalma.
+ * Help page content.
  *
  * @package PostMetaEAC_RotiStudio
  */

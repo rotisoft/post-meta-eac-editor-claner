@@ -158,7 +158,7 @@
 	vertical-align: middle;
 }
 
-/* Alternáló sorháttér: minden második sorpár fehér; inline-edit az előző sorral azonos. */
+/* Alternating row background: every second row pair is white; the inline-edit row matches the row above it. */
 .rspmeac-admin-content .widefat.striped tbody tr:nth-child(4n+1) td,
 .rspmeac-admin-content .widefat.striped tbody tr:nth-child(4n+1) th,
 .rspmeac-admin-content .widefat.striped tbody tr:nth-child(4n+2) td {
@@ -203,7 +203,7 @@
 	margin: 0;
 }
 
-/* FAQ - Help oldal. */
+/* FAQ - Help page. */
 .rspmeac-faq-title {
 	font-size: 16px;
 	font-weight: 600;
@@ -287,7 +287,7 @@
 	color: var(--rspmeac-sotet-zold);
 }
 
-/* Delete / Edit actions lenyílók — .wp-core-ui select felülírása. */
+/* Delete / Edit actions dropdowns - .wp-core-ui select override. */
 .rspmeac-delete-actions-select,
 .rspmeac-edit-actions-select {
 	max-width: -webkit-fill-available !important;
@@ -325,7 +325,7 @@
 	font-style: italic;
 }
 
-/* Bulk action spinner - igazítás az Apply gomb mellé. */
+/* Bulk action spinner - aligned next to the Apply button. */
 .rspmeac-bulk-spinner.spinner {
 	float: none;
 	margin: 0 0 0 4px;
@@ -335,26 +335,26 @@
 	width: 26px;
 }
 
-/* Mobilbarát táblázat - kártyanézet 782px alatt. */
+/* Mobile-friendly table - card view below 782px. */
 @media screen and (max-width: 782px) {
 
-	/* A fixed layout felülbírálása szükséges kártyanézetben. */
+	/* The fixed layout must be overridden in card view. */
 	.rspmeac-admin-content .widefat.fixed {
 		table-layout: auto;
 	}
 
-	/* Fejléc elrejtése — a ::before pseudo-elem veszi át a szerepét. */
+	/* Hide the header - the ::before pseudo-element takes over its role. */
 	.rspmeac-admin-content .widefat thead {
 		display: none;
 	}
 
-	/* Alternáló sávozás kikapcsolása kártyanézetben. */
+	/* Disable alternating stripes in card view. */
 	.rspmeac-admin-content .widefat.striped tr:nth-child(odd) td,
 	.rspmeac-admin-content .widefat.striped tr:nth-child(odd) th {
 		background: transparent;
 	}
 
-	/* Kártyaszerű sorformázás. */
+	/* Card-like row formatting. */
 	.rspmeac-admin-content .widefat tbody tr {
 		display: block;
 		border: 1px solid #ccd0d4;
@@ -363,7 +363,7 @@
 		padding: 4px 0;
 	}
 
-	/* Checkbox sor: kis sáv a kártya tetején. */
+	/* Checkbox row: small bar on top of the card. */
 	.rspmeac-admin-content .widefat tbody th.check-column {
 		display: flex;
 		align-items: center;
@@ -371,7 +371,7 @@
 		border-bottom: 1px solid #f0f0f0;
 	}
 
-	/* Általános cellastílus mobilon. */
+	/* Generic cell style on mobile. */
 	.rspmeac-admin-content .widefat tbody td {
 		display: flex;
 		align-items: flex-start;
@@ -387,7 +387,7 @@
 		border-bottom: none;
 	}
 
-	/* data-label megjelenítése ::before pseudo-elemmel. */
+	/* Show the data-label via a ::before pseudo-element. */
 	.rspmeac-admin-content .widefat tbody td::before {
 		content: attr(data-label);
 		font-weight: 600;
@@ -397,24 +397,24 @@
 		font-size: 12px;
 	}
 
-	/* Delete actions cella tördelése mobilon. */
+	/* Wrap the Delete actions cell on mobile. */
 	.rspmeac-admin-content .widefat tbody td:last-child {
 		flex-wrap: wrap;
 	}
 
-	/* Action selectek mobilon. */
+	/* Action selects on mobile. */
 	.rspmeac-admin-content .widefat .rspmeac-delete-actions-select,
 	.rspmeac-admin-content .widefat .rspmeac-edit-actions-select {
 		min-width: 140px;
 		flex: 1;
 	}
 
-	/* Field content és egyéb oszlopok max-width felülírása mobilon. */
+	/* Override the max-width of the Field content and other columns on mobile. */
 	.rspmeac-admin-content .widefat tbody td[data-label] {
 		max-width: none !important;
 	}
 
-	/* Gombok méretezése mobilon. */
+	/* Button sizing on mobile. */
 	.rspmeac-admin-content .widefat td button {
 		margin: 5px 0;
 		font-size: smaller;

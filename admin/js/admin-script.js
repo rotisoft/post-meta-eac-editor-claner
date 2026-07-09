@@ -1,7 +1,7 @@
 /**
  * Post Meta Editor and Cleaner - Admin script.
  *
- * Meta adatok törlése AJAX kötegelt feldolgozással.
+ * Batched AJAX processing of post meta operations.
  */
 
 /* global jQuery, rspmeacData */
@@ -9,13 +9,13 @@
 ( function ( $ ) {
 	'use strict';
 
-	// Ha a script kétszer töltődne be, ne inicializáljon újra.
+	// Do not initialize twice if the script happens to be loaded twice.
 	if ( window.rspmeacScriptLoaded ) {
 		return;
 	}
 	window.rspmeacScriptLoaded = true;
 
-	// Megakadályozza, hogy párhuzamosan fusson több bulk művelet.
+	// Prevents multiple bulk operations from running in parallel.
 	var bulkActionRunning = false;
 
 	/**
@@ -59,15 +59,15 @@
 					return;
 				}
 
-			var data = response.data;
-			// For destructive actions (delete/delete_value) rows are removed from the
-			// result set after each batch, so always restart from offset 0. For other
-			// actions (overwrite, search_replace) advance the offset normally.
-			var newOffset = data.destructive ? 0 : offset + data.processed;
+				var data = response.data;
 
-			if ( data.has_more ) {
-				processMeta( metaKey, actionType, newOffset, statusEl, callback, extraData );
-			} else {
+				if ( data.has_more ) {
+					// The server owns the continuation logic: destructive
+					// actions restart from 0 because processed rows drop out
+					// of the result set, other actions continue where the
+					// previous batch stopped.
+					processMeta( metaKey, actionType, data.next_offset, statusEl, callback, extraData );
+				} else {
 					statusEl.text( rspmeacData.i18n.done );
 					if ( 'function' === typeof callback ) {
 						callback( true, data );
@@ -87,12 +87,12 @@
 	}
 
 	/**
-	 * Bulk művelet végrehajtása több meta key-re egymás után.
+	 * Run a bulk action on multiple meta keys sequentially.
 	 *
-	 * @param {Array}    metaKeys   Meta kulcsok tömbje.
-	 * @param {string}   actionType Művelet típusa.
-	 * @param {Object}   statusEl   jQuery elem a státusz megjelenítéséhez.
-	 * @param {Function} onDone     Callback a teljes befejezéskor.
+	 * @param {Array}    metaKeys   Array of meta keys.
+	 * @param {string}   actionType Action type.
+	 * @param {Object}   statusEl   jQuery element for status display.
+	 * @param {Function} onDone     Callback when everything is finished.
 	 */
 	function processBulkAction( metaKeys, actionType, statusEl, onDone ) {
 		var index = 0;
@@ -125,16 +125,16 @@
 	}
 
 	/**
-	 * Spinner megjelenítése / elrejtése az Apply gombok mellett.
+	 * Show / hide the spinner next to the Apply buttons.
 	 *
-	 * @param {boolean} show Megjelenítés vagy elrejtés.
+	 * @param {boolean} show Whether to show or hide the spinner.
 	 */
 	function toggleSpinners( show ) {
 		$( '.rspmeac-bulk-spinner' ).toggleClass( 'is-active', show );
 	}
 
 	/**
-	 * Apply gombok állapotának frissítése a kijelölés alapján.
+	 * Update the Apply buttons' state based on the current selection.
 	 */
 	function updateApplyButtons() {
 		var checked = $( 'input[name="meta_keys[]"]:checked' ).length;
@@ -142,13 +142,13 @@
 	}
 
 	$( function () {
-		// Spinner elemek hozzáadása az Apply gombok mellé.
+		// Add spinner elements next to the Apply buttons.
 		$( '#doaction, #doaction2' ).after( '<span class="spinner rspmeac-bulk-spinner"></span>' );
 
-		// Apply gombok kezdetben disabled - nincs kijelölés.
+		// Apply buttons start disabled - nothing is selected yet.
 		$( '#doaction, #doaction2' ).prop( 'disabled', true );
 
-		// Form submit blokkolása - minden műveletet AJAX kezel.
+		// Block form submit - every operation is handled via AJAX.
 		$( '#rspmeac-meta-form' ).on( 'submit', function ( e ) {
 			e.preventDefault();
 		} );
@@ -159,7 +159,7 @@
 			updateApplyButtons();
 		} );
 
-		// Egyedi checkbox-ok: frissíti a Select All állapotát és a gombokat.
+		// Individual checkboxes: update the Select All state and the buttons.
 		$( document ).on( 'change', 'input[name="meta_keys[]"]', function () {
 			var total   = $( 'input[name="meta_keys[]"]' ).length;
 			var checked = $( 'input[name="meta_keys[]"]:checked' ).length;
@@ -171,7 +171,7 @@
 			updateApplyButtons();
 		} );
 
-		// Bulk action gombok.
+		// Bulk action buttons.
 		$( '#doaction, #doaction2' ).off( 'click.rspmeac' ).on( 'click.rspmeac', function ( e ) {
 			e.stopImmediatePropagation();
 
@@ -184,7 +184,7 @@
 				: $( '#bulk-action-selector-bottom' ).val();
 
 			if ( '-1' === selectedAction ) {
-				// eslint-disable-next-line no-alert -- Szándékos felhasználói figyelmeztetés.
+				// eslint-disable-next-line no-alert -- Intentional user warning.
 				window.alert( rspmeacData.i18n.selectAction );
 				return;
 			}
@@ -197,14 +197,14 @@
 
 			var confirmMsg = rspmeacData.i18n.confirmBulk.replace( '%d', checkedItems.length );
 
-			// eslint-disable-next-line no-alert -- Szándékos megerősítés kérés.
+			// eslint-disable-next-line no-alert -- Intentional confirmation dialog.
 			if ( ! window.confirm( confirmMsg ) ) {
 				return;
 			}
 
 			bulkActionRunning = true;
 
-			// Érintett sorok összegyűjtése a DOM frissítéshez.
+			// Collect the affected rows for the DOM update.
 			var $rowMap = {};
 			var metaKeys = [];
 			checkedItems.each( function () {
@@ -213,11 +213,11 @@
 				$rowMap[ key ] = $( this ).closest( 'tr' );
 			} );
 
-			// Gombok letiltása, spinner indítása.
+			// Disable the buttons and start the spinner.
 			$( '#doaction, #doaction2' ).prop( 'disabled', true );
 			toggleSpinners( true );
 
-			// Meglévő status eltávolítása és új létrehozása.
+			// Remove any existing status notice and create a new one.
 			$( '.rspmeac-bulk-status' ).remove();
 			var $statusDiv = $( '<div class="notice notice-info rspmeac-bulk-status"><p></p></div>' );
 			$( '#rspmeac-meta-form' ).prepend( $statusDiv );
@@ -237,7 +237,7 @@
 				$statusDiv.removeClass( 'notice-info' ).addClass( 'notice-success' );
 				statusEl.text( rspmeacData.i18n.done );
 
-				// DOM frissítése reload nélkül.
+				// Update the DOM without a full page reload.
 				$.each( $rowMap, function ( key, $row ) {
 					if ( 'delete' === selectedAction ) {
 						$row.fadeOut( 400, function () {
@@ -251,13 +251,13 @@
 					}
 				} );
 
-				// Select All és Apply gombok visszaállítása.
+				// Reset the Select All checkbox and the Apply buttons.
 				$( '#cb-select-all-1' ).prop( 'checked', false ).prop( 'indeterminate', false );
 				updateApplyButtons();
 			} );
 		} );
 
-		// Delete actions dropdown — törlés végrehajtása kiválasztásra.
+		// Delete actions dropdown - run the delete when an option is selected.
 		$( '.rspmeac-delete-actions-select' ).on( 'change', function () {
 			var action   = $( this ).val();
 			var $select  = $( this );
@@ -307,7 +307,7 @@
 			$( '.rspmeac-meta-status-edit' ).text( '' );
 		}
 
-		// Edit actions dropdown — inline edit panel megnyitása kiválasztásra.
+		// Edit actions dropdown - open the inline edit panel on selection.
 		$( '.rspmeac-edit-actions-select' ).on( 'change', function () {
 			var action   = $( this ).val();
 			var $select  = $( this );

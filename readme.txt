@@ -4,7 +4,7 @@ Tags: post meta, cleanup, database, optimization, editor
 Requires at least: 5.9
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.1.0
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Donate link: https://rotistudio.com/contact/
@@ -76,6 +76,17 @@ The plugin processes posts in batches. If the operation is slow or appears to ha
 
 == Changelog ==
 
+= 1.2.0 =
+* Fix: meta rows stored on post revisions (e.g. Elementor data) could not be deleted or edited - operations now use the low-level metadata API instead of the post meta wrappers, so they target the exact rows shown in the table.
+* Fix: "Delete (value only)" could run in an endless loop when the number of affected posts exceeded the batch size.
+* Fix: posts holding multiple rows for the same meta key no longer collapse into a single value during search & replace - rows are updated individually by meta ID.
+* Fix: batch processing uses deterministic ordering (ORDER BY post ID), so no posts are skipped or processed twice.
+* Fix: values containing backslashes are no longer corrupted on save; meta keys and values with HTML or percent-encoded characters are now matched correctly.
+* Improvement: the batch continuation offset is now calculated server-side.
+* Performance: the meta overview table is cached in a transient (auto-invalidated after every operation) and a "Refresh data" button was added.
+* Performance: deterministic sample value query compatible with ONLY_FULL_GROUP_BY SQL mode.
+* Improvement: unified process speed default (50), canonical admin URLs under Tools, removed dead code.
+
 = 1.1.0 =
 * Minor code fix.
 * WordPress 7.0 compatibility check
@@ -85,6 +96,9 @@ The plugin processes posts in batches. If the operation is slow or appears to ha
 * Initial release.
 
 == Upgrade Notice ==
+
+= 1.2.0 =
+Important bug fixes: deleting meta stored on post revisions now works, endless loop in "Delete (value only)" fixed, safer search & replace on multi-value meta keys. Update recommended.
 
 = 1.1.0 =
 * Minor code fix.

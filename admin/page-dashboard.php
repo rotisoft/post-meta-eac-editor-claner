@@ -11,30 +11,45 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 global $wpdb;
 
-// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Admin page, single grouped query.
-$rspmeac_type_rows = $wpdb->get_results(
-	"SELECT pm.meta_key, p.post_type,
-		SUM(CASE WHEN pm.meta_value != '' THEN 1 ELSE 0 END) AS cnt
-	FROM {$wpdb->postmeta} pm
-	INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
-	WHERE p.post_status NOT IN ('trash', 'auto-draft')
-	GROUP BY pm.meta_key, p.post_type
-	ORDER BY pm.meta_key ASC, p.post_type ASC"
-);
+// The grouped overview query scans the whole postmeta table, so its result is
+// cached in a transient. The cache is invalidated after every AJAX batch and
+// can be flushed manually with the "Refresh data" button.
+$rspmeac_overview = get_transient( 'rspmeac_meta_overview' );
 
-$rspmeac_meta_keys   = array();
-$rspmeac_post_types  = array();
-$rspmeac_post_counts = array();
+if ( ! is_array( $rspmeac_overview ) || ! isset( $rspmeac_overview['meta_keys'], $rspmeac_overview['post_types'], $rspmeac_overview['post_counts'] ) ) {
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Admin page, single grouped query, result cached in a transient.
+	$rspmeac_type_rows = $wpdb->get_results(
+		"SELECT pm.meta_key, p.post_type,
+			SUM(CASE WHEN pm.meta_value != '' THEN 1 ELSE 0 END) AS cnt
+		FROM {$wpdb->postmeta} pm
+		INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
+		WHERE p.post_status NOT IN ('trash', 'auto-draft')
+		GROUP BY pm.meta_key, p.post_type
+		ORDER BY pm.meta_key ASC, p.post_type ASC"
+	);
 
-foreach ( $rspmeac_type_rows as $rspmeac_row ) {
-	if ( ! isset( $rspmeac_post_types[ $rspmeac_row->meta_key ] ) ) {
-		$rspmeac_meta_keys[]                              = $rspmeac_row->meta_key;
-		$rspmeac_post_types[ $rspmeac_row->meta_key ]  = array();
-		$rspmeac_post_counts[ $rspmeac_row->meta_key ] = array();
+	$rspmeac_overview = array(
+		'meta_keys'   => array(),
+		'post_types'  => array(),
+		'post_counts' => array(),
+	);
+
+	foreach ( $rspmeac_type_rows as $rspmeac_row ) {
+		if ( ! isset( $rspmeac_overview['post_types'][ $rspmeac_row->meta_key ] ) ) {
+			$rspmeac_overview['meta_keys'][]                            = $rspmeac_row->meta_key;
+			$rspmeac_overview['post_types'][ $rspmeac_row->meta_key ]  = array();
+			$rspmeac_overview['post_counts'][ $rspmeac_row->meta_key ] = array();
+		}
+		$rspmeac_overview['post_types'][ $rspmeac_row->meta_key ][] = $rspmeac_row->post_type;
+		$rspmeac_overview['post_counts'][ $rspmeac_row->meta_key ][ $rspmeac_row->post_type ] = intval( $rspmeac_row->cnt );
 	}
-	$rspmeac_post_types[ $rspmeac_row->meta_key ][]   = $rspmeac_row->post_type;
-	$rspmeac_post_counts[ $rspmeac_row->meta_key ][ $rspmeac_row->post_type ] = intval( $rspmeac_row->cnt );
+
+	set_transient( 'rspmeac_meta_overview', $rspmeac_overview, 10 * MINUTE_IN_SECONDS );
 }
+
+$rspmeac_meta_keys   = $rspmeac_overview['meta_keys'];
+$rspmeac_post_types  = $rspmeac_overview['post_types'];
+$rspmeac_post_counts = $rspmeac_overview['post_counts'];
 
 // Pagination settings.
 $per_page              = max( 1, intval( get_option( 'rspmeac_items_per_page', 40 ) ) );
@@ -50,11 +65,13 @@ $rspmeac_paged_meta_keys = array_slice( $rspmeac_meta_keys, $rspmeac_offset, $pe
 $rspmeac_sample_values = array();
 if ( ! empty( $rspmeac_paged_meta_keys ) ) {
 	$rspmeac_placeholders = implode( ', ', array_fill( 0, count( $rspmeac_paged_meta_keys ), '%s' ) );
+	// MIN() keeps the query valid under ONLY_FULL_GROUP_BY and makes the
+	// selected sample value deterministic.
 	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- Admin page, variable placeholder count, meta_key index.
 	$rspmeac_sample_rows = $wpdb->get_results(
 		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Placeholder count is dynamic but safe via array_fill.
 		$wpdb->prepare(
-			"SELECT meta_key, meta_value
+			"SELECT meta_key, MIN(meta_value) AS meta_value
 			FROM {$wpdb->postmeta}
 			WHERE meta_key IN ( $rspmeac_placeholders )
 			AND meta_value != ''
@@ -84,6 +101,11 @@ if ( ! empty( $rspmeac_paged_meta_keys ) ) {
 				<option value="delete_value"><?php esc_html_e( 'Delete (value only)', 'rotistudio-post-meta-editor-cleaner' ); ?></option>
 			</select>
 			<button type="button" id="doaction" class="button action"><?php esc_html_e( 'Apply', 'rotistudio-post-meta-editor-cleaner' ); ?></button>
+		</div>
+		<div class="alignleft actions">
+			<a href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'rspmeac_refresh', '1' ), 'rspmeac_refresh' ) ); ?>" class="button">
+				<?php esc_html_e( 'Refresh data', 'rotistudio-post-meta-editor-cleaner' ); ?>
+			</a>
 		</div>
 		<?php if ( $rspmeac_total_pages > 1 ) : ?>
 		<div class="tablenav-pages">
