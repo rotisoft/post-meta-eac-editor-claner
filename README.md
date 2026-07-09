@@ -4,7 +4,6 @@ Post Meta bulk editor to delete unused data, overwrite values, run search and re
 
 **Hungarian:** [Magyar nyelvű bővítményleírás](https://rotistudio.hu/bovitmenyek/post-meta-szerkeszto-es-tisztito/)
 
-| --- | --- |
 | **Requires WordPress** | 5.9+ |
 | **Tested up to** | 7.0 |
 | **Requires PHP** | 7.4+ |
