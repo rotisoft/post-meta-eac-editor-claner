@@ -14,6 +14,10 @@
 
 return array(
     'prefix' => array(
+        'Advance Custom Fields'                             => array(
+            '_acf_changed',
+            '_acf_',
+        ),
         'All in One SEO'                                    => array(
             '_aioseo_',
         ),
@@ -25,6 +29,10 @@ return array(
         'Astra Theme'                                       => array(
             'ast-',
             'astra-',
+        ),
+        'Barion Payment Gateway'                                       => array(
+            'Barion paymentId',
+            'Barion ',
         ),
         'Billingo Plus for WooCommerce'                     => array(
             '_wc_billingo_plus',
@@ -39,6 +47,7 @@ return array(
         ),
         'Csomagpontok és Címkék WooCommerce-hez'             => array(
             '_vp_woo_pont',
+            'wc_selected_pont',
         ),
         'Custom Product Tabs for WooCommerce'               => array(
             'custom_tab_',
@@ -46,10 +55,30 @@ return array(
         'Elementor'                                         => array(
             '_elementor_',
             '__elementor_',
+        ),        
+        'ElementsKit'                                         => array(
+            '_eael_post_view_count',
+            '_eb_reusable_block_ids',
+            'elementskit_',
+        ),        
+        'EmailKit'                                     => array(
+            'emailkit_',
         ),
         'Facebook for WooCommerce'                          => array(
             '_wc_facebook_',
             'fb_',
+        ),
+        'Flamingo'                                => array(
+            '_last_contacted',
+            '_name',
+            '_email',
+            '_props',
+        ),
+        'FluentForm'                                => array(
+            '_has_fluentform',
+        ),
+        'Forminator'                                => array(
+            'forminator_',
         ),
         'Generate Press, Generate Blocks'                   => array(
             '_generate_block_',
@@ -64,11 +93,17 @@ return array(
             '_wpas_',
             '_publicize_',
         ),
+        'MetForm'                                           => array(
+            '_metform_cloned_id',
+            'ekit_post_views_count',
+            'metform_form__form_setting',
+        ),
         'Pixel Manager for WooCommerce'                     => array(
             '_wooptpm_',
         ),
         'PixelYourSite'                                     => array(
             '_pys_',
+            'pys_',
         ),
         'PixelYourSite Product Catalog Feed for WooCommerce' => array(
             'wpfoof-',
@@ -76,6 +111,37 @@ return array(
         'Popup Maker'                                       => array(
             '_aoc_',
             '_pum_',
+        ),
+        'PopupKit'                                          => array(
+            'pbb_',
+            'pbb_posts_fonts',
+            'displayVisitorConvertion',
+            'displayVisitor',
+            'displayFrequencyVisits',
+            'displayFrequencyDays',
+            'displayFrequency',
+            'displayDevice',
+            'displayConditions',
+            'closeCampaign',
+            'certainViewsCount',
+            'certainViews',
+            'campaignType',
+            'footnotes',
+            'ipBlocking',
+            'isTopbar',
+            'newVisitorDays',
+            'openTrigger',
+            'postBodyBackground',
+            'postBodyCss',
+            'postBodyMargin',
+            'postBodyPadding',
+            'returningVisitorDays',
+            'scheduleDateTime',
+            'scheduleOffDateValue',
+            'scheduleOnDateValue',
+            'scheduleTimeZone',
+            'status',
+            '_eb_attr',
         ),
         'Product Feed Manager For Woo (RexThemes)'          => array(
             'rex_feed_',
@@ -85,6 +151,9 @@ return array(
         ),
         'Product GTIN (EAN, UPC, ISBN) for WooCommerce'     => array(
             '_wpm_',
+        ),
+        'Project Tune'                                  => array(
+            '_projecttune_',
         ),
         'Rank Math SEO'                                     => array(
             'rank_math_',
@@ -115,6 +184,13 @@ return array(
             '_cart_',
             '_customer_',
             '_shipping_',
+            '_wc_',
+            '_payment_method_title',
+            '_payment_method',
+            '_order_',
+            '_prices_include_tax',
+            'is_vat_exempt',
+            'ean_code',
         ),
         'WooCommerce Waitlist'                              => array(
             'wcwl_',
@@ -304,6 +380,7 @@ return array(
             '_wp_trash_meta_time',
             'inline_featured_image',
             'origin',
+            'wp_sync_awareness_state',
         ),
         'WP Meta SEO'                             => array(
             'wp_metaseo_seoscore',

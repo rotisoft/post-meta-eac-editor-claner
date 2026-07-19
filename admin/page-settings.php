@@ -9,44 +9,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// Save settings.
-if ( isset( $_POST['submit'], $_POST['rspmeac_settings_nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['rspmeac_settings_nonce'] ) ), 'rspmeac_settings' ) && current_user_can( 'manage_options' ) ) {
-	$rspmeac_process_speed  = isset( $_POST['rspmeac_process_speed'] ) ? absint( $_POST['rspmeac_process_speed'] ) : 50;
-	$rspmeac_items_per_page = isset( $_POST['rspmeac_items_per_page'] ) ? absint( $_POST['rspmeac_items_per_page'] ) : 40;
-	$rspmeac_delete_data    = isset( $_POST['rspmeac_delete_data_on_uninstall'] ) ? 1 : 0;
-
-	// Validation. Default 50 matches the AJAX handler's fallback.
-	$rspmeac_allowed_speeds = array( 1, 5, 10, 20, 50, 100, 500 );
-	if ( ! in_array( $rspmeac_process_speed, $rspmeac_allowed_speeds, true ) ) {
-		$rspmeac_process_speed = 50;
-	}
-
-	if ( $rspmeac_items_per_page < 10 || $rspmeac_items_per_page > 500 ) {
-		$rspmeac_items_per_page = 40;
-	}
-
-	// Save.
-	update_option( 'rspmeac_process_speed', $rspmeac_process_speed );
-	update_option( 'rspmeac_items_per_page', $rspmeac_items_per_page );
-	update_option( 'rspmeac_delete_data_on_uninstall', $rspmeac_delete_data );
-
-	echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Settings saved.', 'rotistudio-post-meta-editor-cleaner' ) . '</p></div>';
-}
-
 // Get current values (with default values).
 $rspmeac_process_speed  = get_option( 'rspmeac_process_speed', 50 );
 $rspmeac_items_per_page = get_option( 'rspmeac_items_per_page', 40 );
 $rspmeac_delete_data    = get_option( 'rspmeac_delete_data_on_uninstall', false );
 ?>
 
-<form method="post" action="">
-	<?php wp_nonce_field( 'rspmeac_settings', 'rspmeac_settings_nonce' ); ?>
+<form method="post" action="options.php">
+	<?php
+	settings_fields( 'rspmeac_settings_group' );
+	do_settings_sections( 'rspmeac_settings_group' );
+	?>
 
 	<table class="form-table" role="presentation">
 		<tbody>
 			<tr>
 				<th scope="row">
-					<label for="rspmeac_process_speed"><?php esc_html_e( 'Process speed', 'rotistudio-post-meta-editor-cleaner' ); ?></label>
+					<label for="rspmeac_process_speed"><?php esc_html_e( 'Process speed', 'post-meta-eac-rotistudio' ); ?></label>
 				</th>
 				<td>
 					<select name="rspmeac_process_speed" id="rspmeac_process_speed">
@@ -59,13 +38,13 @@ $rspmeac_delete_data    = get_option( 'rspmeac_delete_data_on_uninstall', false 
 						<option value="500" <?php selected( $rspmeac_process_speed, 500 ); ?>>500</option>
 					</select>
 					<p class="description">
-						<?php esc_html_e( 'If you experience errors or timeouts, decrease this value and try again. Only set to high values if you know what you are doing.', 'rotistudio-post-meta-editor-cleaner' ); ?>
+						<?php esc_html_e( 'If you experience errors or timeouts, decrease this value and try again. Only set to high values if you know what you are doing.', 'post-meta-eac-rotistudio' ); ?>
 					</p>
 				</td>
 			</tr>
 			<tr>
 				<th scope="row">
-					<label for="rspmeac_items_per_page"><?php esc_html_e( 'Items per page', 'rotistudio-post-meta-editor-cleaner' ); ?></label>
+					<label for="rspmeac_items_per_page"><?php esc_html_e( 'Items per page', 'post-meta-eac-rotistudio' ); ?></label>
 				</th>
 				<td>
 					<input
@@ -78,13 +57,13 @@ $rspmeac_delete_data    = get_option( 'rspmeac_delete_data_on_uninstall', false 
 						class="small-text"
 					/>
 					<p class="description">
-						<?php esc_html_e( 'Specify how many meta keys to display per page. Not recommended to set too high, only on powerful servers.', 'rotistudio-post-meta-editor-cleaner' ); ?>
+						<?php esc_html_e( 'Specify how many meta keys to display per page. Not recommended to set too high, only on powerful servers.', 'post-meta-eac-rotistudio' ); ?>
 					</p>
 				</td>
 			</tr>
 			<tr>
 				<th scope="row">
-					<?php esc_html_e( 'Uninstall', 'rotistudio-post-meta-editor-cleaner' ); ?>
+					<?php esc_html_e( 'Uninstall', 'post-meta-eac-rotistudio' ); ?>
 				</th>
 				<td>
 					<label for="rspmeac_delete_data_on_uninstall">
@@ -95,7 +74,7 @@ $rspmeac_delete_data    = get_option( 'rspmeac_delete_data_on_uninstall', false 
 							value="1"
 							<?php checked( $rspmeac_delete_data ); ?>
 						/>
-						<?php esc_html_e( 'Remove plugin settings and custom data when you delete this plugin from the plugin list.', 'rotistudio-post-meta-editor-cleaner' ); ?>
+						<?php esc_html_e( 'Remove plugin settings and custom data when you delete this plugin from the plugin list.', 'post-meta-eac-rotistudio' ); ?>
 					</label>
 				</td>
 			</tr>
@@ -103,4 +82,30 @@ $rspmeac_delete_data    = get_option( 'rspmeac_delete_data_on_uninstall', false 
 	</table>
 
 	<?php submit_button(); ?>
+</form>
+
+<hr />
+
+<h2><?php esc_html_e( 'Post meta table index', 'post-meta-eac-rotistudio' ); ?></h2>
+
+<p class="description">
+	<?php esc_html_e( 'Clears the cached overview so the Post Meta table page returns to the first-launch state. You will need to click Read data again before the table and tools appear. On large sites that scan can take several minutes.', 'post-meta-eac-rotistudio' ); ?>
+</p>
+
+<form
+	method="post"
+	action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>"
+	class="rspmeac-reset-overview-form"
+	onsubmit="return window.confirm( <?php echo wp_json_encode( __( 'Clear the cached post meta index and return to the Read data screen?', 'post-meta-eac-rotistudio' ) ); ?> );"
+>
+	<input type="hidden" name="action" value="rspmeac_reset_overview" />
+	<?php wp_nonce_field( 'rspmeac_reset_overview' ); ?>
+	<?php
+	submit_button(
+		__( 'Clear index and require re-read', 'post-meta-eac-rotistudio' ),
+		'secondary',
+		'submit',
+		false
+	);
+	?>
 </form>

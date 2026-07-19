@@ -1,0 +1,488 @@
+# Copyright (C) 2026 RotiStudio
+# This file is distributed under the GPLv2 or later.
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Post Meta Editor and Cleaner by RotiStudio 1.3.0\n"
+"Report-Msgid-Bugs-To: https://rotistudio.com/\n"
+"POT-Creation-Date: 2026-07-14 14:00+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Manual\n"
+
+#: admin/admin-core.php:121
+#: admin/admin-core.php:122
+#: admin/admin-core.php:287
+msgid "Post Meta EAC"
+msgstr ""
+
+#: admin/admin-core.php:130
+#: admin/admin-core.php:131
+#: admin/admin-core.php:157
+#: admin/admin-core.php:245
+#: admin/admin-core.php:890
+msgid "Settings"
+msgstr ""
+
+#: admin/admin-core.php:139
+#: admin/admin-core.php:140
+#: admin/admin-core.php:158
+#: admin/admin-core.php:246
+#: admin/admin-core.php:895
+msgid "Help"
+msgstr ""
+
+#: admin/admin-core.php:209
+msgid "Processing…"
+msgstr ""
+
+#: admin/admin-core.php:210
+#, php-format
+msgid "Processing: %1$d%% (%2$s / %3$s)"
+msgstr ""
+
+#: admin/admin-core.php:211
+msgid "Done!"
+msgstr ""
+
+#: admin/admin-core.php:212
+#, php-format
+msgid "Done! Skipped rows: %d (objects, unreadable serialized data and key conflicts are left untouched)."
+msgstr ""
+
+#: admin/admin-core.php:213
+msgid "An error occurred."
+msgstr ""
+
+#: admin/admin-core.php:214
+msgid "Connection problem, retrying…"
+msgstr ""
+
+#: admin/admin-core.php:215
+msgid "Are you sure you want to delete this meta key and all its values for all posts? Trashed and auto-draft posts are not affected."
+msgstr ""
+
+#: admin/admin-core.php:216
+msgid "Are you sure you want to clear the values of this meta key for all posts? The key itself will remain. Trashed and auto-draft posts are not affected."
+msgstr ""
+
+#: admin/admin-core.php:218
+#, php-format
+msgid "Are you sure you want to perform this action on %d selected items?"
+msgstr ""
+
+#: admin/admin-core.php:219
+msgid "Please select an action."
+msgstr ""
+
+#: admin/admin-core.php:220
+msgid "Please select at least one item."
+msgstr ""
+
+#: admin/admin-core.php:221
+msgid "Are you sure you want to overwrite and replace the full post meta field content? Trashed and auto-draft posts are not affected."
+msgstr ""
+
+#: admin/admin-core.php:222
+msgid "Are you sure you want to perform search & replace on all values (values only) for this meta key? Trashed and auto-draft posts are not affected."
+msgstr ""
+
+#: admin/admin-core.php:223
+msgid "Are you sure you want to perform search & replace on all values and keys (name and value) for this meta key? Trashed and auto-draft posts are not affected."
+msgstr ""
+
+#: admin/admin-core.php:224
+#: admin/page-dashboard.php:224
+msgid "New value:"
+msgstr ""
+
+#: admin/admin-core.php:225
+#: admin/page-dashboard.php:232
+msgid "Search:"
+msgstr ""
+
+#: admin/admin-core.php:226
+#: admin/page-dashboard.php:235
+msgid "Replace with:"
+msgstr ""
+
+#: admin/admin-core.php:227
+#: admin/page-dashboard.php:123
+#: admin/page-dashboard.php:227
+#: admin/page-dashboard.php:238
+#: admin/page-dashboard.php:257
+msgid "Apply"
+msgstr ""
+
+#: admin/admin-core.php:228
+#: admin/page-dashboard.php:228
+#: admin/page-dashboard.php:239
+msgid "Cancel"
+msgstr ""
+
+msgid "No value"
+msgstr ""
+
+msgid "What do you want to search in?"
+msgstr ""
+
+msgid "Search term"
+msgstr ""
+
+#, php-format
+msgid "Search %s"
+msgstr ""
+
+#, php-format
+msgid "Filter %s"
+msgstr ""
+
+msgid "Search"
+msgstr ""
+
+msgid "All"
+msgstr ""
+
+msgid "Size"
+msgstr ""
+
+msgid "Actions"
+msgstr ""
+
+msgid "Edit"
+msgstr ""
+
+msgid "Delete"
+msgstr ""
+
+#: admin/admin-core.php:244
+msgid "Post Meta table"
+msgstr ""
+
+#: admin/admin-core.php:292
+msgid "Post Meta Editor and Cleaner by RotiStudio"
+msgstr ""
+
+#: admin/admin-core.php:362
+#, php-format
+msgid "%s item"
+msgid_plural "%s items"
+msgstr[0] ""
+msgstr[1] ""
+
+#: admin/admin-core.php:374
+msgid "First page"
+msgstr ""
+
+#: admin/admin-core.php:380
+msgid "Previous page"
+msgstr ""
+
+#: admin/admin-core.php:389
+msgid "Current Page"
+msgstr ""
+
+#: admin/admin-core.php:396
+#, php-format
+msgid "%1$s of %2$s"
+msgstr ""
+
+#: admin/admin-core.php:408
+msgid "Next page"
+msgstr ""
+
+#: admin/admin-core.php:414
+msgid "Last page"
+msgstr ""
+
+#: admin/admin-core.php:603
+msgid "Unauthorized"
+msgstr ""
+
+#: admin/admin-core.php:624
+#: admin/admin-core.php:629
+msgid "Invalid parameters"
+msgstr ""
+
+#: admin/admin-core.php:639
+msgid "Another operation is already running on this meta key. Please wait until it finishes, then refresh the page."
+msgstr ""
+
+#: admin/admin-core.php:821
+#, php-format
+msgid "Some items could not be updated (post IDs: %s). The operation has been stopped, no further batches will run."
+msgstr ""
+
+#: admin/admin-core.php:885
+msgid "Post Meta list"
+msgstr ""
+
+#: admin/page-dashboard.php:110
+msgid "Always make a backup before modifying or deleting data!"
+msgstr ""
+
+#: admin/page-dashboard.php:117
+#: admin/page-dashboard.php:251
+msgid "Select bulk action"
+msgstr ""
+
+#: admin/page-dashboard.php:119
+#: admin/page-dashboard.php:253
+msgid "Bulk actions"
+msgstr ""
+
+#: admin/page-dashboard.php:120
+#: admin/page-dashboard.php:215
+#: admin/page-dashboard.php:254
+msgid "Delete (key + value)"
+msgstr ""
+
+#: admin/page-dashboard.php:121
+#: admin/page-dashboard.php:216
+#: admin/page-dashboard.php:255
+msgid "Delete (value only)"
+msgstr ""
+
+#: admin/page-dashboard.php:127
+msgid "Refresh data"
+msgstr ""
+
+#: admin/page-dashboard.php:156
+msgid "Refresh all data"
+msgstr ""
+
+#: admin/page-dashboard.php:30
+msgid "Post meta data is not loaded yet."
+msgstr ""
+
+#: admin/page-dashboard.php:33
+msgid "On large sites (for example WooCommerce catalogs with many products) reading the index can take several minutes. Start when you are ready - the table and tools appear after the scan finishes."
+msgstr ""
+
+#: admin/page-dashboard.php:37
+msgid "Read data"
+msgstr ""
+
+#: admin/admin-core.php:1339
+msgid "Reading data… Please wait, this may take several minutes on large sites."
+msgstr ""
+
+#: admin/admin-core.php:251
+#, php-format
+msgid "Sort by %s"
+msgstr ""
+
+#: admin/page-dashboard.php:138
+msgid "Select All"
+msgstr ""
+
+#: admin/page-dashboard.php:141
+#: admin/page-dashboard.php:183
+msgid "Meta Key"
+msgstr ""
+
+#: admin/page-dashboard.php:142
+#: admin/page-dashboard.php:184
+msgid "Source"
+msgstr ""
+
+#: admin/page-dashboard.php:143
+#: admin/page-dashboard.php:185
+msgid "Post Type"
+msgstr ""
+
+#: admin/page-dashboard.php:144
+#: admin/page-dashboard.php:186
+msgid "Count"
+msgstr ""
+
+#: admin/page-dashboard.php:145
+#: admin/page-dashboard.php:201
+msgid "Field content"
+msgstr ""
+
+#: admin/page-dashboard.php:146
+#: admin/page-dashboard.php:204
+msgid "Edit actions"
+msgstr ""
+
+#: admin/page-dashboard.php:147
+#: admin/page-dashboard.php:212
+msgid "Delete actions"
+msgstr ""
+
+#: admin/page-dashboard.php:153
+msgid "No post meta data found."
+msgstr ""
+
+#: admin/page-dashboard.php:179
+msgid "Bulk select"
+msgstr ""
+
+#: admin/page-dashboard.php:206
+#: admin/page-dashboard.php:214
+msgid "Choose…"
+msgstr ""
+
+#: admin/page-dashboard.php:207
+#: admin/page-help.php:94
+msgid "Overwrite"
+msgstr ""
+
+#: admin/page-dashboard.php:208
+#: admin/page-help.php:99
+msgid "Search and replace (only value)"
+msgstr ""
+
+#: admin/page-dashboard.php:209
+#: admin/page-help.php:104
+msgid "Search and replace (name and value)"
+msgstr ""
+
+#: admin/page-help.php:15
+msgid "Frequently Asked Questions"
+msgstr ""
+
+#: admin/page-help.php:20
+msgid "Do I need to create a backup before using this plugin?"
+msgstr ""
+
+#: admin/page-help.php:23
+msgid "Yes — always create a full database backup before deleting any post meta data. Deletions are permanent and cannot be undone without a backup."
+msgstr ""
+
+#: admin/page-help.php:24
+msgid "You can create a backup using a backup plugin (e.g. UpdraftPlus, All-in-One WP Migration) or directly from phpMyAdmin by exporting your database."
+msgstr ""
+
+#: admin/page-help.php:31
+msgid "Can a deletion be undone?"
+msgstr ""
+
+#: admin/page-help.php:34
+msgid "No. Deletions are irreversible and can only be restored from a database backup."
+msgstr ""
+
+#: admin/page-help.php:41
+msgid "The operation is very slow or seems to be stuck — what should I do?"
+msgstr ""
+
+#: admin/page-help.php:44
+msgid "The plugin processes posts in batches. If the operation is slow or appears to hang, reduce the batch size in the Settings page."
+msgstr ""
+
+#: admin/page-help.php:45
+msgid "Lower the \"Process Speed\" value (e.g. from 50 to 10–20). This reduces the number of posts processed per request, which lowers the load on your server."
+msgstr ""
+
+#: admin/page-help.php:52
+msgid "What is the difference between \"Delete (key + value)\" and \"Delete (value only)\"?"
+msgstr ""
+
+#: admin/page-help.php:56
+msgid "Delete (key + value):"
+msgstr ""
+
+#: admin/page-help.php:58
+msgid "Permanently removes the meta key and all its values from every post. The key will no longer appear in the table."
+msgstr ""
+
+#: admin/page-help.php:61
+msgid "Delete (value only):"
+msgstr ""
+
+#: admin/page-help.php:63
+msgid "Clears the stored value but keeps the meta key in the database. Each existing meta row is cleared individually, so posts storing multiple values under the same key keep their row count. The key remains visible in the table with a count of 0."
+msgstr ""
+
+#: admin/page-help.php:70
+msgid "What does the \"Count\" column show?"
+msgstr ""
+
+#: admin/page-help.php:73
+msgid "The Count column shows the number of posts that have a non-empty value stored for the given meta key. Posts that have the key but an empty value are not counted."
+msgstr ""
+
+#: admin/page-help.php:80
+msgid "Which posts are affected by the operations?"
+msgstr ""
+
+#: admin/page-help.php:83
+msgid "All post types are processed, including revisions. Trashed and auto-draft posts, and orphaned meta rows without an existing post, are excluded from both the table and the operations."
+msgstr ""
+
+#: admin/page-help.php:90
+msgid "What are the Edit actions (Overwrite, Search and replace)?"
+msgstr ""
+
+#: admin/page-help.php:96
+msgid "Replaces the full post meta field content for all posts with the new value you enter. Use this when you want to set the same value everywhere."
+msgstr ""
+
+#: admin/page-help.php:101
+msgid "Finds and replaces text only in the stored values. Array keys (names) in serialized data remain unchanged. Works on both plain text and serialized arrays."
+msgstr ""
+
+#: admin/page-help.php:106
+msgid "Finds and replaces text in both values and array keys within serialized data. Use this when you need to rename keys (e.g. pa_color to pa_color2) in addition to values."
+msgstr ""
+
+#: admin/page-help.php:108
+msgid "For safety, some rows are skipped and left untouched: values containing PHP objects, serialized data that cannot be read, and rows where a key rename would overwrite another existing key. The status message shows how many rows were skipped."
+msgstr ""
+
+#: admin/page-help.php:115
+msgid "Who can use the plugin?"
+msgstr ""
+
+#: admin/page-help.php:118
+msgid "By default, users with the manage_post_meta_cleanup capability (administrators receive it on plugin activation). Since the plugin exposes and edits post meta of every post type, sites with custom roles can tighten this via the rspmeac_capability filter."
+msgstr ""
+
+#: admin/page-settings.php:34
+msgid "Settings saved."
+msgstr ""
+
+#: admin/page-settings.php:50
+msgid "Process speed"
+msgstr ""
+
+#: admin/page-settings.php:63
+msgid "If you experience errors or timeouts, decrease this value and try again. Only set to high values if you know what you are doing."
+msgstr ""
+
+#: admin/page-settings.php:69
+msgid "Items per page"
+msgstr ""
+
+#: admin/page-settings.php:82
+msgid "Specify how many meta keys to display per page. Not recommended to set too high, only on powerful servers."
+msgstr ""
+
+#: admin/page-settings.php:88
+msgid "Uninstall"
+msgstr ""
+
+#: admin/page-settings.php:99
+msgid "Remove plugin settings and custom data when you delete this plugin from the plugin list."
+msgstr ""
+
+#: admin/page-settings.php:108
+msgid "Post meta table index"
+msgstr ""
+
+#: admin/page-settings.php:111
+msgid "Clears the cached overview so the Post Meta table page returns to the first-launch state. You will need to click Read data again before the table and tools appear. On large sites that scan can take several minutes."
+msgstr ""
+
+#: admin/page-settings.php:118
+msgid "Clear the cached post meta index and return to the Read data screen?"
+msgstr ""
+
+#: admin/page-settings.php:123
+msgid "Clear index and require re-read"
+msgstr ""
