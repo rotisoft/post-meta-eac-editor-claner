@@ -63,16 +63,6 @@ Where can we learn more about your work? See the personal site: [rottenbacher.hu
 
 ---
 
-## Screenshots
-
-1. **screenshot-1.jpg** - Post meta table view
-2. **screenshot-2.jpg** - Read data on first load
-3. **screenshot-3.jpg** - Settings page and clear indexed data
-4. **screenshot-4.jpg** - Help documentation page
-5. **screenshot-5.jpg** - Post Meta table in the admin
-
----
-
 ## Frequently asked questions
 
 ### How can I use it?
