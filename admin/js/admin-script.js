@@ -120,7 +120,7 @@
 
 		var postData = {
 			action:      'rspmeac_process_meta',
-			nonce:       rspmeacData.nonce,
+			nonce:       rspmeacData.nonces.process,
 			meta_key:    metaKey,
 			action_type: actionType,
 			cursor:      cursor,
@@ -258,7 +258,7 @@
 			rspmeacData.ajaxUrl,
 			{
 				action:    'rspmeac_refresh_meta_overview',
-				nonce:     rspmeacData.nonce,
+				nonce:     rspmeacData.nonces.refresh,
 				meta_keys: metaKeys,
 			},
 			function ( response ) {
@@ -368,7 +368,7 @@
 			rspmeacData.ajaxUrl,
 			{
 				action:      'rspmeac_count_meta_operations',
-				nonce:       rspmeacData.nonce,
+				nonce:       rspmeacData.nonces.count,
 				action_type: actionType,
 				meta_keys:   metaKeys,
 			},

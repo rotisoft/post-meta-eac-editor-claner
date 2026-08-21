@@ -2,9 +2,9 @@
 Contributors: rtomo, rotistudio
 Tags: post meta, cleanup, database, optimization, editor
 Requires at least: 5.9
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.3.0
+Stable tag: 1.4.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Donate link: https://rotistudio.com/contact/
@@ -93,6 +93,17 @@ By default, users with the `manage_post_meta_cleanup` capability (administrators
 
 == Changelog ==
 
+= 1.4.0 =
+* Improvement: AJAX endpoints use action-specific nonces (process, refresh, count) instead of one shared nonce.
+* Improvement: operation locks store the owning user ID - another admin cannot continue or hijack an in-flight checkpoint via a guessed operation ID.
+* Improvement: same operation ID with altered parameters (fingerprint mismatch) is rejected instead of rewriting the checkpoint.
+* Improvement: Settings API options require the plugin capability (`manage_post_meta_cleanup`), matching the admin UI.
+* Improvement: meta keys and values strip null bytes and invalid UTF-8 before prepared SQL / meta API use; operation IDs require a minimum length.
+* Improvement: bulk refresh and count requests are capped at 500 meta keys per request.
+* Improvement: direct file access guard on `meta-sources.php`.
+* Improvement: capability grant extracted to `rspmeac_add_capabilities()` for activation and upgrade sync.
+* Compatibility: tested with WordPress 7.1.
+
 = 1.3.0 =
 * Improvement: first visit to the Post Meta table no longer runs the expensive overview scan automatically - a Read data button starts it when you are ready (better UX on large WooCommerce sites).
 * Improvement: Settings action to clear the cached index and return to the Read data screen (same as first launch).
@@ -142,6 +153,9 @@ By default, users with the `manage_post_meta_cleanup` capability (administrators
 * Initial release.
 
 == Upgrade Notice ==
+
+= 1.4.0 =
+Hardening for AJAX nonces, operation locks, and Settings capability checks. Tested with WordPress 7.1. Update recommended.
 
 = 1.3.0 =
 Important data-safety fixes plus large-site UX: double-serialized values are no longer corrupted by search & replace, interrupted operations are safe to retry, and the overview scan starts only when you click Read data. Update strongly recommended.

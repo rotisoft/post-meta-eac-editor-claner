@@ -385,6 +385,35 @@
 	margin: 0;
 }
 
+/* Uninstall opt-in block on the Settings page (avoid core .notice - WP relocates it). */
+.rspmeac-admin-content .rspmeac-uninstall-row th {
+	color: #b32d2e;
+}
+
+.rspmeac-admin-content .rspmeac-uninstall-warning {
+	max-width: 42em;
+	padding: 12px 14px;
+	background-color: #fdefef;
+	border-left: 3px solid #b32d2e;
+	border-radius: 0 5px 5px 0;
+}
+
+.rspmeac-admin-content .rspmeac-uninstall-warning label {
+	display: block;
+	margin: 0 0 10px;
+	color: #1d2327;
+	font-weight: 600;
+}
+
+.rspmeac-admin-content .rspmeac-uninstall-warning .description {
+	margin: 0;
+	color: #b32d2e;
+}
+
+.rspmeac-admin-content .rspmeac-uninstall-warning .description strong {
+	color: #8a2424;
+}
+
 /* FAQ - Help page. */
 .rspmeac-faq-title {
 	font-size: 16px;

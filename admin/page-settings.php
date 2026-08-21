@@ -61,21 +61,28 @@ $rspmeac_delete_data    = get_option( 'rspmeac_delete_data_on_uninstall', false 
 					</p>
 				</td>
 			</tr>
-			<tr>
+			<tr class="rspmeac-uninstall-row">
 				<th scope="row">
 					<?php esc_html_e( 'Uninstall', 'post-meta-eac-rotistudio' ); ?>
 				</th>
 				<td>
-					<label for="rspmeac_delete_data_on_uninstall">
-						<input
-							type="checkbox"
-							id="rspmeac_delete_data_on_uninstall"
-							name="rspmeac_delete_data_on_uninstall"
-							value="1"
-							<?php checked( $rspmeac_delete_data ); ?>
-						/>
-						<?php esc_html_e( 'Remove plugin settings and custom data when you delete this plugin from the plugin list.', 'post-meta-eac-rotistudio' ); ?>
-					</label>
+					<div class="rspmeac-uninstall-warning">
+						<label for="rspmeac_delete_data_on_uninstall">
+							<input type="hidden" name="rspmeac_delete_data_on_uninstall" value="0" />
+							<input
+								type="checkbox"
+								id="rspmeac_delete_data_on_uninstall"
+								name="rspmeac_delete_data_on_uninstall"
+								value="1"
+								<?php checked( $rspmeac_delete_data, 1 ); ?>
+							/>
+							<?php esc_html_e( 'Delete plugin data when this plugin is removed from the Plugins list.', 'post-meta-eac-rotistudio' ); ?>
+						</label>
+						<p class="description">
+							<strong><?php esc_html_e( 'Warning:', 'post-meta-eac-rotistudio' ); ?></strong>
+							<?php esc_html_e( 'This only applies when you delete the plugin (not when you deactivate it). Checked: removes plugin settings from the options table, the cached post meta overview index (transients), and leftover operation lock records. It does not delete post meta rows from the database (wp_postmeta).', 'post-meta-eac-rotistudio' ); ?>
+						</p>
+					</div>
 				</td>
 			</tr>
 		</tbody>

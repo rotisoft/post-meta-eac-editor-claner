@@ -3,7 +3,7 @@
  * Plugin Name: Post Meta Editor and Cleaner by RotiStudio
  * Plugin URI: https://rotistudio.com/plugins/post-meta-eac-editor-cleaner/
  * Description: Post Meta bulk editor to delete unused data, overwrite values, run search and replace, and clean your database directly from the admin panel.
- * Version: 1.3.0
+ * Version: 1.4.0
  * Requires at least: 5.9
  * Requires PHP: 7.4
  * Author: RotiStudio - Tamas Rottenbacher
@@ -19,20 +19,31 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'RSPMEAC_VERSION', '1.3.0' );
+define( 'RSPMEAC_VERSION', '1.4.0' );
 define( 'RSPMEAC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'RSPMEAC_URL', plugin_dir_url( __FILE__ ) );
 
 /**
- * Grant the plugin capability to administrators on activation.
+ * Grant the plugin capability to administrators.
+ *
+ * Shared by activation and upgrade so capability sync stays in one place.
  *
  * @return void
  */
-function rspmeac_activate() {
+function rspmeac_add_capabilities() {
 	$role = get_role( 'administrator' );
 	if ( $role ) {
 		$role->add_cap( 'manage_post_meta_cleanup' );
 	}
+}
+
+/**
+ * Run capability grant on plugin activation.
+ *
+ * @return void
+ */
+function rspmeac_activate() {
+	rspmeac_add_capabilities();
 }
 register_activation_hook( __FILE__, 'rspmeac_activate' );
 
@@ -46,7 +57,7 @@ function rspmeac_ensure_capability() {
 		return;
 	}
 
-	rspmeac_activate();
+	rspmeac_add_capabilities();
 	update_option( 'rspmeac_caps_version', RSPMEAC_VERSION, false );
 }
 add_action( 'admin_init', 'rspmeac_ensure_capability', 5 );

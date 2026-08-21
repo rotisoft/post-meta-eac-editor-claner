@@ -48,6 +48,28 @@ function rspmeac_get_capability() {
 }
 
 /**
+ * Normalize a meta key from request input for prepared SQL / meta API use.
+ *
+ * Preserves the key verbatim (no sanitize_text_field) so DB matches succeed,
+ * but rejects invalid UTF-8 and strips null bytes.
+ *
+ * @param mixed $raw Raw input value.
+ * @return string Normalized meta key, or empty string when invalid.
+ */
+function rspmeac_normalize_meta_key( $raw ) {
+	if ( ! is_string( $raw ) ) {
+		return '';
+	}
+
+	$rspmeac_key = wp_check_invalid_utf8( $raw );
+	if ( ! is_string( $rspmeac_key ) ) {
+		return '';
+	}
+
+	return str_replace( "\0", '', $rspmeac_key );
+}
+
+/**
  * Build reverse lookup maps for meta keys based on meta-sources.php.
  *
  * Return value:
@@ -1173,6 +1195,8 @@ function rspmeac_disable_option_autoload( $option ) {
  * @return void
  */
 function rspmeac_register_settings() {
+	$rspmeac_capability = rspmeac_get_capability();
+
 	register_setting(
 		'rspmeac_settings_group',
 		'rspmeac_process_speed',
@@ -1181,6 +1205,7 @@ function rspmeac_register_settings() {
 			'sanitize_callback' => 'rspmeac_sanitize_process_speed',
 			'default'           => 50,
 			'show_in_rest'      => false,
+			'capability'        => $rspmeac_capability,
 		)
 	);
 
@@ -1192,6 +1217,7 @@ function rspmeac_register_settings() {
 			'sanitize_callback' => 'rspmeac_sanitize_items_per_page',
 			'default'           => 40,
 			'show_in_rest'      => false,
+			'capability'        => $rspmeac_capability,
 		)
 	);
 
@@ -1203,6 +1229,7 @@ function rspmeac_register_settings() {
 			'sanitize_callback' => 'rspmeac_sanitize_delete_on_uninstall',
 			'default'           => 0,
 			'show_in_rest'      => false,
+			'capability'        => $rspmeac_capability,
 		)
 	);
 }
@@ -1310,7 +1337,11 @@ function rspmeac_enqueue_admin_assets( $hook_suffix ) {
 		'rspmeacData',
 		array(
 			'ajaxUrl' => admin_url( 'admin-ajax.php' ),
-			'nonce'   => wp_create_nonce( 'rspmeac_meta_nonce' ),
+			'nonces'  => array(
+				'process' => wp_create_nonce( 'rspmeac_process_meta' ),
+				'refresh' => wp_create_nonce( 'rspmeac_refresh_meta_overview' ),
+				'count'   => wp_create_nonce( 'rspmeac_count_meta_operations' ),
+			),
 			'i18n'    => array(
 				'processing'         => __( 'Processing…', 'post-meta-eac-rotistudio' ),
 				/* translators: 1: percentage, 2: completed items, 3: total items. */
@@ -1741,11 +1772,7 @@ function rspmeac_get_sample_values_for_keys( $meta_keys ) {
 	$rspmeac_samples = array();
 
 	foreach ( (array) $meta_keys as $rspmeac_raw_key ) {
-		if ( ! is_string( $rspmeac_raw_key ) ) {
-			continue;
-		}
-
-		$rspmeac_key = wp_check_invalid_utf8( $rspmeac_raw_key );
+		$rspmeac_key = rspmeac_normalize_meta_key( $rspmeac_raw_key );
 		if ( '' === $rspmeac_key ) {
 			continue;
 		}
@@ -1824,10 +1851,7 @@ function rspmeac_refresh_overview_for_keys( $meta_keys ) {
 
 	$rspmeac_keys = array();
 	foreach ( (array) $meta_keys as $rspmeac_raw_key ) {
-		if ( ! is_string( $rspmeac_raw_key ) ) {
-			continue;
-		}
-		$rspmeac_key = wp_check_invalid_utf8( $rspmeac_raw_key );
+		$rspmeac_key = rspmeac_normalize_meta_key( $rspmeac_raw_key );
 		if ( '' === $rspmeac_key ) {
 			continue;
 		}
@@ -1945,19 +1969,22 @@ function rspmeac_refresh_overview_for_keys( $meta_keys ) {
  * @return void
  */
 function rspmeac_ajax_refresh_meta_overview() {
-	check_ajax_referer( 'rspmeac_meta_nonce', 'nonce' );
+	check_ajax_referer( 'rspmeac_refresh_meta_overview', 'nonce' );
 
 	if ( ! current_user_can( rspmeac_get_capability() ) ) {
 		wp_send_json_error( array( 'message' => __( 'Unauthorized', 'post-meta-eac-rotistudio' ) ) );
 	}
 
-	// phpcs:disable WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Meta keys preserved verbatim; validated as strings then queried via prepared SQL.
+	// phpcs:disable WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Meta keys preserved verbatim via rspmeac_normalize_meta_key(); queried via prepared SQL.
 	$rspmeac_raw_keys = isset( $_POST['meta_keys'] ) ? wp_unslash( $_POST['meta_keys'] ) : array();
 	// phpcs:enable WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
 	if ( ! is_array( $rspmeac_raw_keys ) || empty( $rspmeac_raw_keys ) ) {
 		wp_send_json_error( array( 'message' => __( 'Invalid parameters', 'post-meta-eac-rotistudio' ) ) );
 	}
+
+	// Cap batch size to limit expensive selective scans from a single request.
+	$rspmeac_raw_keys = array_slice( $rspmeac_raw_keys, 0, 500 );
 
 	$rspmeac_rows = rspmeac_refresh_overview_for_keys( $rspmeac_raw_keys );
 
@@ -2169,6 +2196,8 @@ function rspmeac_count_posts_for_meta_operation( $meta_key, $action_type ) {
  *  - A per-meta-key lock record (non-autoloaded option) rejects a second
  *    operation started from another tab or by another admin while one is
  *    still running.
+ *  - The lock stores the owning user_id so another capable user cannot
+ *    continue or hijack an in-flight checkpoint via a guessed op_id.
  *  - The lock record stores the last completed keyset cursor. A retried
  *    batch (lost response, network error) can never step backwards, so
  *    already processed rows are not replayed - this keeps non-idempotent
@@ -2178,7 +2207,7 @@ function rspmeac_count_posts_for_meta_operation( $meta_key, $action_type ) {
  */
 function rspmeac_ajax_process_meta() {
 	// phpcs:disable WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Admin batch operation, meta_key required, wp_postmeta has native index.
-	check_ajax_referer( 'rspmeac_meta_nonce', 'nonce' );
+	check_ajax_referer( 'rspmeac_process_meta', 'nonce' );
 
 	if ( ! current_user_can( rspmeac_get_capability() ) ) {
 		wp_send_json_error( array( 'message' => __( 'Unauthorized', 'post-meta-eac-rotistudio' ) ) );
@@ -2190,18 +2219,21 @@ function rspmeac_ajax_process_meta() {
 	// only and used exclusively through $wpdb->prepare() and the meta API,
 	// both of which are injection-safe. Output is escaped elsewhere.
 	// phpcs:disable WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-	$meta_key      = isset( $_POST['meta_key'] ) && is_string( $_POST['meta_key'] ) ? wp_check_invalid_utf8( wp_unslash( $_POST['meta_key'] ) ) : '';
+	$meta_key      = isset( $_POST['meta_key'] ) ? rspmeac_normalize_meta_key( wp_unslash( $_POST['meta_key'] ) ) : '';
 	$action_type   = isset( $_POST['action_type'] ) ? sanitize_text_field( wp_unslash( $_POST['action_type'] ) ) : '';
 	$cursor        = isset( $_POST['cursor'] ) ? absint( $_POST['cursor'] ) : 0;
 	$op_id         = isset( $_POST['op_id'] ) ? sanitize_key( wp_unslash( $_POST['op_id'] ) ) : '';
 	$new_value     = isset( $_POST['new_value'] ) && is_string( $_POST['new_value'] ) ? wp_check_invalid_utf8( wp_unslash( $_POST['new_value'] ) ) : '';
 	$search_value  = isset( $_POST['search_value'] ) && is_string( $_POST['search_value'] ) ? wp_check_invalid_utf8( wp_unslash( $_POST['search_value'] ) ) : '';
 	$replace_value = isset( $_POST['replace_value'] ) && is_string( $_POST['replace_value'] ) ? wp_check_invalid_utf8( wp_unslash( $_POST['replace_value'] ) ) : '';
+	$new_value     = is_string( $new_value ) ? str_replace( "\0", '', $new_value ) : '';
+	$search_value  = is_string( $search_value ) ? str_replace( "\0", '', $search_value ) : '';
+	$replace_value = is_string( $replace_value ) ? str_replace( "\0", '', $replace_value ) : '';
 	// phpcs:enable WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
 	$allowed_actions = array( 'delete', 'delete_value', 'overwrite', 'search_replace_value', 'search_replace_value_and_key' );
 
-	if ( '' === $meta_key || '' === $op_id || ! in_array( $action_type, $allowed_actions, true ) ) {
+	if ( '' === $meta_key || strlen( $op_id ) < 8 || ! in_array( $action_type, $allowed_actions, true ) ) {
 		wp_send_json_error( array( 'message' => __( 'Invalid parameters', 'post-meta-eac-rotistudio' ) ) );
 	}
 
@@ -2213,17 +2245,32 @@ function rspmeac_ajax_process_meta() {
 	// Server-side operation lock and checkpoint.
 	$lock_name   = rspmeac_get_operation_lock_name( $meta_key );
 	$now         = time();
+	$user_id     = get_current_user_id();
 	$fingerprint = md5( wp_json_encode( array( $action_type, $new_value, $search_value, $replace_value ) ) );
 	$state       = get_option( $lock_name, false );
 
-	if ( is_array( $state ) && isset( $state['op_id'], $state['expires'] ) && $state['expires'] > $now && $state['op_id'] !== $op_id ) {
-		wp_send_json_error( array( 'message' => __( 'Another operation is already running on this meta key. Please wait until it finishes, then refresh the page.', 'post-meta-eac-rotistudio' ) ) );
-	}
+	if ( is_array( $state ) && isset( $state['op_id'], $state['expires'] ) && $state['expires'] > $now ) {
+		$rspmeac_lock_user = isset( $state['user_id'] ) ? (int) $state['user_id'] : 0;
 
-	if ( is_array( $state ) && isset( $state['op_id'], $state['fingerprint'], $state['cursor'] ) && $state['op_id'] === $op_id && $state['fingerprint'] === $fingerprint ) {
-		// Retried batch after a lost response: resume from the stored
-		// checkpoint instead of replaying already processed rows.
-		$cursor = max( $cursor, (int) $state['cursor'] );
+		// Another admin (or a stolen op_id) must not continue or hijack this lock.
+		if ( $rspmeac_lock_user > 0 && $rspmeac_lock_user !== $user_id ) {
+			wp_send_json_error( array( 'message' => __( 'Another operation is already running on this meta key. Please wait until it finishes, then refresh the page.', 'post-meta-eac-rotistudio' ) ) );
+		}
+
+		if ( $state['op_id'] !== $op_id ) {
+			wp_send_json_error( array( 'message' => __( 'Another operation is already running on this meta key. Please wait until it finishes, then refresh the page.', 'post-meta-eac-rotistudio' ) ) );
+		}
+
+		// Same op_id with altered parameters would bypass the checkpoint - reject.
+		if ( isset( $state['fingerprint'] ) && $state['fingerprint'] !== $fingerprint ) {
+			wp_send_json_error( array( 'message' => __( 'Invalid parameters', 'post-meta-eac-rotistudio' ) ) );
+		}
+
+		if ( isset( $state['cursor'] ) ) {
+			// Retried batch after a lost response: resume from the stored
+			// checkpoint instead of replaying already processed rows.
+			$cursor = max( $cursor, (int) $state['cursor'] );
+		}
 	}
 
 	$rspmeac_total     = ( is_array( $state ) && isset( $state['op_id'], $state['total'] ) && $state['op_id'] === $op_id )
@@ -2237,6 +2284,7 @@ function rspmeac_ajax_process_meta() {
 		$lock_name,
 		array(
 			'op_id'       => $op_id,
+			'user_id'     => $user_id,
 			'fingerprint' => $fingerprint,
 			'cursor'      => $cursor,
 			'total'       => $rspmeac_total,
@@ -2388,6 +2436,7 @@ function rspmeac_ajax_process_meta() {
 			$lock_name,
 			array(
 				'op_id'       => $op_id,
+				'user_id'     => $user_id,
 				'fingerprint' => $fingerprint,
 				'cursor'      => $last_post_id,
 				'total'       => $rspmeac_total,
@@ -2451,7 +2500,7 @@ add_action( 'wp_ajax_rspmeac_process_meta', 'rspmeac_ajax_process_meta', 10 );
  * @return void
  */
 function rspmeac_ajax_count_meta_operations() {
-	check_ajax_referer( 'rspmeac_meta_nonce', 'nonce' );
+	check_ajax_referer( 'rspmeac_count_meta_operations', 'nonce' );
 
 	if ( ! current_user_can( rspmeac_get_capability() ) ) {
 		wp_send_json_error( array( 'message' => __( 'Unauthorized', 'post-meta-eac-rotistudio' ) ) );
@@ -2464,7 +2513,7 @@ function rspmeac_ajax_count_meta_operations() {
 		wp_send_json_error( array( 'message' => __( 'Invalid parameters', 'post-meta-eac-rotistudio' ) ) );
 	}
 
-	// phpcs:disable WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Meta keys preserved verbatim; validated as strings then counted via prepared SQL.
+	// phpcs:disable WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Meta keys preserved verbatim via rspmeac_normalize_meta_key(); counted via prepared SQL.
 	$rspmeac_raw_keys = isset( $_POST['meta_keys'] ) ? wp_unslash( $_POST['meta_keys'] ) : array();
 	// phpcs:enable WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
@@ -2472,18 +2521,16 @@ function rspmeac_ajax_count_meta_operations() {
 		wp_send_json_error( array( 'message' => __( 'Invalid parameters', 'post-meta-eac-rotistudio' ) ) );
 	}
 
-	$rspmeac_totals = array();
-	$rspmeac_sum    = 0;
+	$rspmeac_raw_keys = array_slice( $rspmeac_raw_keys, 0, 500 );
+	$rspmeac_totals   = array();
+	$rspmeac_sum      = 0;
 
 	foreach ( $rspmeac_raw_keys as $rspmeac_raw_key ) {
-		if ( ! is_string( $rspmeac_raw_key ) ) {
-			continue;
-		}
-		$rspmeac_key = wp_check_invalid_utf8( $rspmeac_raw_key );
+		$rspmeac_key = rspmeac_normalize_meta_key( $rspmeac_raw_key );
 		if ( '' === $rspmeac_key ) {
 			continue;
 		}
-		$rspmeac_count                 = rspmeac_count_posts_for_meta_operation( $rspmeac_key, $action_type );
+		$rspmeac_count                  = rspmeac_count_posts_for_meta_operation( $rspmeac_key, $action_type );
 		$rspmeac_totals[ $rspmeac_key ] = $rspmeac_count;
 		$rspmeac_sum                   += $rspmeac_count;
 	}

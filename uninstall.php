@@ -3,6 +3,8 @@
  * Plugin uninstall handler.
  *
  * Runs only when the user deletes the plugin from the WordPress admin.
+ * Data cleanup is opt-in via Settings → “Delete plugin data when this plugin
+ * is removed from the Plugins list.”
  *
  * @package PostMetaEAC_RotiStudio
  */
@@ -14,8 +16,11 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 /**
  * Delete all plugin data for the current site.
  *
- * Removes the plugin options, the cached overview transient and any leftover
- * per-meta-key operation lock records (rspmeac_op_* options).
+ * Removes plugin options, the cached overview index (transients), leftover
+ * per-meta-key operation lock records (rspmeac_op_*), and the custom
+ * capability granted to administrators on activation.
+ *
+ * Does not delete rows from wp_postmeta.
  *
  * @return void
  */
@@ -28,7 +33,7 @@ function rspmeac_uninstall_site_data() {
 	delete_option( 'rspmeac_delete_data_on_uninstall' );
 	delete_option( 'rspmeac_caps_version' );
 
-	// Delete cached overview data.
+	// Delete cached overview index.
 	delete_transient( 'rspmeac_meta_overview' );
 	delete_transient( 'rspmeac_meta_overview_lock' );
 
@@ -42,12 +47,21 @@ function rspmeac_uninstall_site_data() {
 		)
 	);
 
-	foreach ( $rspmeac_lock_options as $rspmeac_lock_option ) {
-		delete_option( $rspmeac_lock_option );
+	if ( is_array( $rspmeac_lock_options ) ) {
+		foreach ( $rspmeac_lock_options as $rspmeac_lock_option ) {
+			delete_option( $rspmeac_lock_option );
+		}
+	}
+
+	// Remove the capability granted on activation.
+	$rspmeac_role = get_role( 'administrator' );
+	if ( $rspmeac_role ) {
+		$rspmeac_role->remove_cap( 'manage_post_meta_cleanup' );
 	}
 }
 
-$rspmeac_delete_data = get_option( 'rspmeac_delete_data_on_uninstall', false );
+// Read the opt-in flag before any option is deleted.
+$rspmeac_delete_data = (bool) get_option( 'rspmeac_delete_data_on_uninstall', false );
 
 if ( is_multisite() ) {
 	// Clean up every site where the option is enabled.
@@ -59,7 +73,7 @@ if ( is_multisite() ) {
 	);
 
 	foreach ( $rspmeac_site_ids as $rspmeac_site_id ) {
-		switch_to_blog( $rspmeac_site_id );
+		switch_to_blog( (int) $rspmeac_site_id );
 
 		if ( get_option( 'rspmeac_delete_data_on_uninstall', false ) ) {
 			rspmeac_uninstall_site_data();

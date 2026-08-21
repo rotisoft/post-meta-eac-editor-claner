@@ -12,6 +12,10 @@
  * @package PostMetaEAC_RotiStudio
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 return array(
     'prefix' => array(
         'Advance Custom Fields'                             => array(

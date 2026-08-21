@@ -3,10 +3,10 @@
 # Hungarian (Hungary) translation - semleges nyelvezet
 msgid ""
 msgstr ""
-"Project-Id-Version: Post Meta Editor and Cleaner by RotiStudio 1.3.0\n"
+"Project-Id-Version: Post Meta Editor and Cleaner by RotiStudio 1.4.0\n"
 "Report-Msgid-Bugs-To: https://rotistudio.com/\n"
 "POT-Creation-Date: 2026-07-14 14:00+0200\n"
-"PO-Revision-Date: 2026-07-19 17:15+0200\n"
+"PO-Revision-Date: 2026-08-22 00:28+0200\n"
 "Last-Translator: RotiStudio <info@rotistudio.hu>\n"
 "Language-Team: Magyar <hu@li.org>\n"
 "Language: hu_HU\n"
@@ -440,8 +440,16 @@ msgid "Uninstall"
 msgstr "Eltávolítás"
 
 #: admin/page-settings.php:99
-msgid "Remove plugin settings and custom data when you delete this plugin from the plugin list."
-msgstr "Bővítmény beállításainak és egyéni adatainak törlése a plugin listából való eltávolításkor."
+msgid "Delete plugin data when this plugin is removed from the Plugins list."
+msgstr "Plugin adatok törlése, amikor a bővítményt eltávolítod a Bővítmények listából."
+
+#: admin/page-settings.php:102
+msgid "Warning:"
+msgstr "Figyelmeztetés:"
+
+#: admin/page-settings.php:103
+msgid "This only applies when you delete the plugin (not when you deactivate it). Checked: removes plugin settings from the options table, the cached post meta overview index (transients), and leftover operation lock records. It does not delete post meta rows from the database (wp_postmeta)."
+msgstr "Ez csak a bővítmény törlésekor érvényes (deaktiváláskor nem). Bejelölve: törli a plugin beállításokat az options táblából, a gyorsítótárazott post meta áttekintés-indexet (transienteket) és a fennmaradt műveletzár rekordokat. Nem törli a bejegyzés meta sorokat az adatbázisból (wp_postmeta)."
 
 #: admin/page-settings.php:108
 msgid "Post meta table index"
