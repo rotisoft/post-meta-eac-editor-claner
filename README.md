@@ -7,9 +7,9 @@ Post Meta bulk editor to delete unused data, overwrite values, run search and re
 | | |
 | --- | --- |
 | **Requires WordPress** | 5.9+ |
-| **Tested up to** | 7.0 |
+| **Tested up to** | 7.1 |
 | **Requires PHP** | 7.4+ |
-| **Stable tag** | 1.3.0 |
+| **Stable tag** | 1.4.0 |
 | **License** | [GPLv2 or later](https://www.gnu.org/licenses/gpl-2.0.html) |
 
 **Contributors:** rtomo, rotistudio  
@@ -93,55 +93,7 @@ By default, users with the `manage_post_meta_cleanup` capability (administrators
 
 ## Changelog
 
-### 1.3.0
-
-- Improvement: first visit to the Post Meta table no longer runs the expensive overview scan automatically - a Read data button starts it when you are ready (better UX on large WooCommerce sites).
-- Improvement: Settings action to clear the cached index and return to the Read data screen (same as first launch).
-- Improvement: unified progress display for bulk and row actions - Processing: X% (completed / total), updated after each batch from Process speed.
-- Improvement: Refresh all data rebuilds the full overview; bulk Refresh data updates only the selected rows (counts, size, source, sample) without a full page rebuild.
-- Improvement: Edit and Delete merged into one Actions column (icon toggles).
-- Improvement: Size column (MB); Meta Key, Source, Count and Size are sortable (ASC/DESC). Default order remains Meta Key ascending.
-- Improvement: column filters for Meta Key (text search), Source and Post Type (select).
-- Improvement: advanced Search panel - search in meta key, post type and field content (including serialized fragments), with optional meta key / source narrowing.
-- Improvement: language files updated - regenerate or update your .mo translation files (e.g. via Poedit) so new UI strings appear in your language.
-- Performance: overview rebuild uses one grouped SQL scan (counts + sizes) with a rebuild lock; sources are resolved once into the cache; TTL extended; after operations only the affected key is refreshed in the cache.
-- Performance: sample values for the current page use LIMIT 1 per key and are truncated in SQL (no heavy GROUP BY / full LONGTEXT loads).
-- Performance: batch processing uses keyset pagination (post ID cursor) and prefetches affected meta rows in one query per batch.
-- Fix: search & replace no longer corrupts double-serialized meta values - nested serialized strings are unserialized, processed and re-serialized layer by layer, so the stored byte-length prefixes stay valid.
-- Fix: search & replace on names and values aborts the row when a key rename would overwrite another existing key (including numeric-string key casts), instead of silently losing data.
-- Fix: embedded serialized data is unserialized with object instantiation disabled (allowed_classes false) and a nesting depth limit, so crafted payloads cannot trigger object wakeup code or endless recursion; rows containing objects or unreadable serialized data are skipped and reported.
-- Fix: every database write is verified - failed updates or deletes stop the operation with the affected post IDs instead of reporting a false success.
-- Fix: "Delete (value only)" clears each meta row individually by meta ID, so posts storing multiple values under the same key keep their row count instead of collapsing into a single row.
-- Fix: a per-meta-key server-side lock rejects concurrent operations started from another tab or by another admin.
-- Fix: interrupted operations are safe to retry - the server stores a checkpoint per operation, failed requests are retried automatically and already processed rows are never replayed (no more double replacements).
-- Fix: the Count column counts posts (distinct), not meta rows, matching the Help page description.
-- Fix: the sample value shown in the table now excludes trashed, auto-draft and orphaned meta rows, consistently with the counts.
-- Fix: the admin page no longer fatals when the PHP mbstring extension is missing.
-- Fix: meta keys named like "null", "true" or JSON literals no longer break the row actions (verbatim data attribute reads).
-- Improvement: settings are registered via the WordPress Settings API; plugin options are stored without autoload.
-- Improvement: dedicated `manage_post_meta_cleanup` capability (granted to administrators on activation); customizable via the `rspmeac_capability` filter.
-- Improvement: uninstall also removes the cached overview transient and leftover operation lock records, with multisite support.
-- Improvement: unified pagination rendering without duplicated element IDs; UI texts clarify that trashed and auto-draft posts are not affected.
-
-### 1.2.0
-
-- Fix: meta rows stored on post revisions (e.g. Elementor data) could not be deleted or edited - operations now use the low-level metadata API instead of the post meta wrappers, so they target the exact rows shown in the table.
-- Fix: "Delete (value only)" could run in an endless loop when the number of affected posts exceeded the batch size.
-- Fix: posts holding multiple rows for the same meta key no longer collapse into a single value during search & replace - rows are updated individually by meta ID.
-- Fix: batch processing uses deterministic ordering (ORDER BY post ID), so no posts are skipped or processed twice.
-- Fix: values containing backslashes are no longer corrupted on save; meta keys and values with HTML or percent-encoded characters are now matched correctly.
-- Improvement: the batch continuation offset is now calculated server-side.
-- Performance: the meta overview table is cached in a transient (auto-invalidated after every operation) and a "Refresh data" button was added.
-- Performance: deterministic sample value query compatible with ONLY_FULL_GROUP_BY SQL mode.
-- Improvement: unified process speed default (50), canonical admin URLs under Tools, removed dead code.
-
-### 1.1.0
-
-- Minor code fix.
-- WordPress 7.0 compatibility check
-- PHP 8.5 compatibility check
-
-### 1.0.0
+Check on WordPress.org [Changelog - Post Meta Editor and Cleaner]([https://rotistudio.com/plugins/](https://wordpress.org/plugins/rotistudio-post-meta-editor-cleaner/#developers))
 
 - Initial release.
 
