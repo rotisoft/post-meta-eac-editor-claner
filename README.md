@@ -93,8 +93,4 @@ By default, users with the `manage_post_meta_cleanup` capability (administrators
 
 ## Changelog
 
-Check on WordPress.org [Changelog - Post Meta Editor and Cleaner]([https://rotistudio.com/plugins/](https://wordpress.org/plugins/rotistudio-post-meta-editor-cleaner/#developers))
-
-- Initial release.
-
-Full changelog on WordPress.org: [developers section](https://wordpress.org/plugins/rotistudio-post-meta-editor-cleaner/#developers)
+Full changelog on WordPress.org: [Changelog - Post Meta Editor and Cleaner](https://wordpress.org/plugins/rotistudio-post-meta-editor-cleaner/#developers)
